@@ -119,34 +119,32 @@
                       </g>
                     </svg>
                   </span>
-                  <span class="app-brand-text demo text-body fw-bolder">Sneat</span>
+                  <span class="app-brand-text demo menu-text fw-bolder ms-2" style="text-transform: capitalize;">
+                    Sportify X
+                </span>
                 </a>
               </div>
               <!-- /Logo -->
-              <h4 class="mb-2">Forgot Password? 🔒</h4>
-              <p class="mb-4">Enter your email and we'll send you instructions to reset your password</p>
+              <h4 class="mb-5">OTP Verification 🔒</h4>
+              {% comment %} <p class="mb-4">Enter your OTP and we'll send you instructions to reset your password</p> {% endcomment %}
               <form id="formAuthentication" class="mb-3" action="#" method="POST">
                 {% csrf_token %}
-                <div class="mb-3">
-                  <label for="email" class="form-label">Email</label>
+                <div class="mb-5">
+                  <label for="otp" class="form-label">Enter OTP</label>
                   <input 
-                    type="email" 
+                    type="text" 
                     class="form-control" 
-                    id="email" 
-                    name="email" 
-                    placeholder="Enter your email" 
+                    id="otp" 
+                    name="otp" 
+                    placeholder="Enter OTP" 
                     required 
                     autofocus 
                   />
                 </div>
-                <button type = "submit " class="btn btn-primary d-grid w-100">Send Reset Link</button>
+                
+                <button type = "submit " class="btn btn-primary d-grid w-100">Verify OTP</button>
               </form>
-              <div class="text-center">
-                <a href="{% url "adminlogin" %}" class="d-flex align-items-center justify-content-center">
-                  <i class="bx bx-chevron-left scaleX-n1-rtl bx-sm"></i>
-                  Back to login
-                </a>
-              </div>
+              
             </div>
           </div>
           <!-- /Forgot Password -->

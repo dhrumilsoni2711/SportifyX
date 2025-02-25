@@ -1,222 +1,135 @@
 <html>
   {% extends "adminapp/admin-master.html" %}
-{% load static %}
-<head>
-</head>
-{% block content %}
+  {% load static %}
+  <head>
+  </head>
+  {% block content %}
 
-          <!-- Content wrapper -->
-          <div class="content-wrapper">
-            <!-- Content -->
+  <div class="content-wrapper">
+    <div class="container-xxl flex-grow-1 container-p-y">
+      <h3 class="fw-bold py-3 mb-4"> Add Venue </h3>
+    </div>
 
-            <div class="container-xxl flex-grow-1 container-p-y">
-              <h3 class="fw-bold py-3 mb-4"> Add Venue </h3>
-            </div>
-                    <div class="card-body">
-                      <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                          <label class="form-label" for="basic-icon-default-fullname">Venue Name</label>
-                          <div class="input-group input-group-merge">
-                            <span id="basic-icon-default-fullname2" class="input-group-text"
-                              ><i class="bx bx-user"></i
-                            ></span>
-                            <input
-                              type="text"
-                              class="form-control"
-                              id="basic-icon-default-fullname"
-                              placeholder="Enter a Venue Name"
-                              aria-label="Venue Name"
-                              aria-describedby="basic-icon-default-fullname2"
-                              name ="name"
-                            />
-                          </div>
-                        </div>
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Venue Name -->
+        <div class="mb-3">
+          <label class="form-label" for="venue-name">Venue Name</label>
+          <input type="text" class="form-control" id="venue-name" name="name" placeholder="Enter a Venue Name" required />
+        </div>
 
-                        <!-- Address -->
+        <!-- Venue Address -->
+        <div class="mb-3">
+          <label class="form-label" for="venue-address">Venue Address</label>
+          <input type="text" class="form-control" id="venue-address" name="address" placeholder="Enter venue address" required />
+        </div>
 
-                        <div class="mb-3">
-                          <label class="form-label" for="venue-address">Venue Address</label>
-                          <div class="input-group input-group-merge">
-                            <span id="basic-icon-default-company2" class="input-group-text">
-                              <i class="bx bx-map"></i>
-                            </span>
-                            <input
-                              type="text"
-                              id="venue-address"
-                              class="form-control"
-                              placeholder="Enter venue address"
-                              aria-label="Venue Address"
-                              aria-describedby="basic-icon-default-company2"
-                              name="address"
-                            />
-                          </div>
-                        
-                        </div>
-                       
+        <!-- Select Games -->
+        <div class="mb-3">
+          <label class="form-label">Select Games</label>
+          <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="gameDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              Select Games
+            </button>
+            <ul class="dropdown-menu p-3" aria-labelledby="gameDropdown">
+              {% for context in game_data %}
+                <li><input type="checkbox" class="form-check-input game-option" value="{{ context.game_name }}"> {{ context.game_name }} </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
 
+        <div class="mb-3">
+          <label class="form-label" for="selectedGamesTextBox">Selected Games</label>
+          <input type="text" class="form-control" id="selectedGamesTextBox" readonly placeholder="Selected games will appear here">
+          <input type="hidden" name="games" id="selectedGames">  <!-- Hidden input to store selected game IDs -->
+        </div>
 
-                        <!-- Contact No-->
+        <!-- State and City Selection -->
+        <div class="mb-3">
+          <label class="form-label" for="state-select">State</label>
+          <select id="state-select" class="form-control" name="state" onchange="updateCities()" required>
+            <option value="" selected disabled>Select a state</option>
+            <option value="Gujarat">Gujarat</option>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Karnataka">Karnataka</option>
+            <option value="Delhi">Delhi</option>
+          </select>
+        </div>
 
+        <div class="mb-3">
+          <label class="form-label" for="city-select">City</label>
+          <select id="city-select" class="form-control" name="city" required>
+            <option value="" selected disabled>Select a city</option>
+          </select>
+        </div>
 
-                        <div class="mb-3">
-                          <label class="form-label" for="basic-icon-default-phone">Contact</label>
-                          <div class="input-group input-group-merge">
-                            <span id="basic-icon-default-phone2" class="input-group-text">+91</span>
-                            <input
-                              type="tel"
-                              id="basic-icon-default-phone"
-                              class="form-control phone-mask"
-                              placeholder="Enter 10-digit number"
-                              aria-label="Contact Number"
-                              aria-describedby="basic-icon-default-phone2"
-                              name="contact"
-                              maxlength="10"
-                              pattern="[0-9]{10}"
-                              required
-                            />
-                          </div>
-                        
-                        </div>
+        <!-- Upload Image -->
+        <div class="mb-3">
+          <label class="form-label">Upload Image</label>
+          <input type="file" name="image" class="form-control" required />
+        </div>
 
-                         
-                         <!-- State and City -->
+        <!-- Location URL -->
+        <div class="mb-3">
+          <label class="form-label" for="location">Location URL</label>
+          <input type="url" name="location" class="form-control" id="location" placeholder="Enter Google Maps URL" required />
+        </div>
 
-                        <div class="mb-3">
-                          <label class="form-label" for="state-select">State</label>
-                          <div class="input-group input-group-merge">
-                            <span class="input-group-text">
-                              <i class="bx bx-buildings"></i>
-                            </span>
-                            <select id="state-select" class="form-control" name="state" onchange="updateCities()">
-                              <option value="" selected disabled>Select a state</option>
-                              <option value="Andhra Pradesh">Andhra Pradesh</option>
-                              <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                              <option value="Assam">Assam</option>
-                              <option value="Bihar">Bihar</option>
-                              <option value="Chhattisgarh">Chhattisgarh</option>
-                              <option value="Goa">Goa</option>
-                              <option value="Gujarat">Gujarat</option>
-                              <option value="Haryana">Haryana</option>
-                              <option value="Himachal Pradesh">Himachal Pradesh</option>
-                              <option value="Jharkhand">Jharkhand</option>
-                              <option value="Karnataka">Karnataka</option>
-                              <option value="Kerala">Kerala</option>
-                              <option value="Madhya Pradesh">Madhya Pradesh</option>
-                              <option value="Maharashtra">Maharashtra</option>
-                              <option value="Manipur">Manipur</option>
-                              <option value="Meghalaya">Meghalaya</option>
-                              <option value="Mizoram">Mizoram</option>
-                              <option value="Nagaland">Nagaland</option>
-                              <option value="Odisha">Odisha</option>
-                              <option value="Punjab">Punjab</option>
-                              <option value="Rajasthan">Rajasthan</option>
-                              <option value="Sikkim">Sikkim</option>
-                              <option value="Tamil Nadu">Tamil Nadu</option>
-                              <option value="Telangana">Telangana</option>
-                              <option value="Tripura">Tripura</option>
-                              <option value="Uttar Pradesh">Uttar Pradesh</option>
-                              <option value="Uttarakhand">Uttarakhand</option>
-                              <option value="West Bengal">West Bengal</option>
-                            </select>
-                          </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                          <label class="form-label" for="city-select">City</label>
-                          <div class="input-group input-group-merge">
-                            <span class="input-group-text">
-                              <i class="bx bx-buildings"></i>
-                            </span>
-                            <select id="city-select" class="form-control" name="city">
-                              <option value="" selected disabled>Select a city</option>
-                            </select>
-                          </div>
-                        </div>
-                          
-                       <!-- Image -->
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
 
-                        </div>
-                        <div class="mb-3">
-                          <label class="form-label" for="basic-icon-default-message">Upload Image</label>
-                          <div class="input-group input-group-merge">
-                          <input type = "file" name = "image" class="form-control" id="basic-icon-default-message" placeholder="Message" aria-label="Message" aria-describedby="basic-icon-default-message2"/>
-                          </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- / Content -->
+  <!-- JavaScript -->
+  <script>
+    // Cities by state
+    const citiesByState = {
+      "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot"],
+      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik"],
+      "Karnataka": ["Bangalore", "Mysore", "Hubli"],
+      "Delhi": ["New Delhi", "Noida", "Gurgaon"]
+    };
 
-          
-            <script>
+    function updateCities() {
+      const stateSelect = document.getElementById("state-select");
+      const citySelect = document.getElementById("city-select");
+      const selectedState = stateSelect.value;
 
+      citySelect.innerHTML = '<option value="" selected disabled>Select a city</option>';
 
-              
+      if (selectedState && citiesByState[selectedState]) {
+        citiesByState[selectedState].forEach(city => {
+          const option = document.createElement("option");
+          option.value = city;
+          option.textContent = city;
+          citySelect.appendChild(option);
+        });
+      }
+    }
 
+    document.addEventListener('DOMContentLoaded', function () {
+      const checkboxes = document.querySelectorAll('.game-option');
+      const selectedGamesInput = document.getElementById('selectedGames');
+      const selectedGamesTextBox = document.getElementById('selectedGamesTextBox');
 
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+          const selectedGames = [];
+          checkboxes.forEach(option => {
+            if (option.checked) {
+              selectedGames.push(option.value);
+            }
+          });
 
-              // Phone number input mask
-              document.getElementById("basic-icon-default-phone").addEventListener("input", function (event) {
-                this.value = this.value.replace(/\D/g, ""); // Remove non-numeric characters
-                if (this.value.length > 10) {
-                  this.value = this.value.slice(0, 10); // Limit to 10 digits
-                }
-              });
+          selectedGamesTextBox.value = selectedGames.join(', ');
+          selectedGamesInput.value = selectedGames.join(', ');  // Store comma-separated IDs
+        });
+      });
+    });
+  </script>
 
-              // Cities by state
-              const citiesByState = {
-                "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Nellore"],
-                "Arunachal Pradesh": ["Itanagar", "Tawang", "Pasighat"],
-                "Assam": ["Guwahati", "Dibrugarh", "Silchar"],
-                "Bihar": ["Patna", "Gaya", "Bhagalpur"],
-                "Chhattisgarh": ["Raipur", "Bilaspur", "Durg"],
-                "Goa": ["Panaji", "Margao", "Vasco da Gama"],
-                "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot"],
-                "Haryana": ["Gurgaon", "Faridabad", "Panipat"],
-                "Himachal Pradesh": ["Shimla", "Manali", "Dharamshala"],
-                "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad"],
-                "Karnataka": ["Bangalore", "Mysore", "Hubli"],
-                "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode"],
-                "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior", "Jabalpur"],
-                "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik"],
-                "Manipur": ["Imphal", "Thoubal", "Bishnupur"],
-                "Meghalaya": ["Shillong", "Tura", "Jowai"],
-                "Mizoram": ["Aizawl", "Lunglei", "Saiha"],
-                "Nagaland": ["Kohima", "Dimapur", "Mokokchung"],
-                "Odisha": ["Bhubaneswar", "Cuttack", "Puri", "Rourkela"],
-                "Punjab": ["Amritsar", "Ludhiana", "Jalandhar", "Patiala"],
-                "Rajasthan": ["Jaipur", "Udaipur", "Jodhpur", "Kota"],
-                "Sikkim": ["Gangtok", "Namchi", "Mangan"],
-                "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Salem"],
-                "Telangana": ["Hyderabad", "Warangal", "Nizamabad"],
-                "Tripura": ["Agartala", "Udaipur", "Dharmanagar"],
-                "Uttar Pradesh": ["Lucknow", "Kanpur", "Varanasi", "Agra"],
-                "Uttarakhand": ["Dehradun", "Haridwar", "Nainital"],
-                "West Bengal": ["Kolkata", "Howrah", "Darjeeling", "Siliguri"]
-              };
-            
-              function updateCities() {
-                const stateSelect = document.getElementById("state-select");
-                const citySelect = document.getElementById("city-select");
-                const selectedState = stateSelect.value;
-            
-                citySelect.innerHTML = '<option value="" selected disabled>Select a city</option>'; // Reset city options
-            
-                if (selectedState && citiesByState[selectedState]) {
-                  citiesByState[selectedState].forEach(city => {
-                    const option = document.createElement("option");
-                    option.value = city;
-                    option.textContent = city;
-                    citySelect.appendChild(option);
-                  });
-                }
-              }
-            </script>
-         
+  {% endblock %}
 </html>
-{% endblock %}

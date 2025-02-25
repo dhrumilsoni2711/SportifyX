@@ -1,0 +1,60 @@
+{% extends "adminapp/admin-master.html" %}
+{% load static %}
+{% block content %}
+
+<!-- Content wrapper -->
+<div class="content-wrapper">
+  <!-- Content -->
+  <div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Tables /</span> Game Tables</h4>
+
+    <!-- Basic Bootstrap Table -->
+    <div class="card">
+      <h5 class="card-header">Game Category</h5>
+      <div class="text-nowrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Game Name</th>
+              <th scope="col">Description</th>
+              <th scope="col">Image</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+            {% for game in data %}
+            <tr>
+              <th scope="row">{{ game.id }}</th>
+              <td>{{ game.game_name }}</td>
+              <td>{{ game.description }}</td>
+              <td>
+                <img src="{{ game.image.url }}" alt="Game Image" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+              </td>
+              <td>
+                <div class="dropdown">
+                  <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                    <i class="bx bx-dots-vertical-rounded"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="{% url 'edit_game_category' game.id %}">
+                      <i class="bx bx-edit me-1"></i> Edit
+                    </a>
+                    <a class="dropdown-item" href="#" onclick="return confirm('Are you sure you want to delete this game category?');">
+                      <i class="bx bx-trash me-1"></i> Delete
+                    </a>
+                  </div>
+                  
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!--/ Basic Bootstrap Table -->
+  </div>
+</div>
+
+{% endblock %}

@@ -19,27 +19,35 @@
                     <thead>
                       <tr>
                         <th scope ="col1">ID</th>
-                        <th scope ="col1">First Name </th>
-                        <th scope ="col1">Last Name </th>
+                        {% comment %} <th scope ="col1">First Name </th>
+                        <th scope ="col1">Last Name </th> {% endcomment %}
+                        <th scope ="col1">Username</th>
                         <th scope ="col1">Contact </th>
                         <th scope ="col1">Email</th>
+                        <th scope ="col1">Address</th>
+                        
                       </tr>
                     </thead>
                     <tbody class="table-border-bottom-0">
                       {% for context in data %}
                       <tr>
                         <th scope="row">{{ context.id }}</td>
-                        <td>{{ context.firstname }}</td>
-                        <td>{{ context.lastname }}</td>
+                        {% comment %} <td>{{ context.firstname }}</td>
+                        <td>{{ context.lastname }}</td> {% endcomment %}
+                        <td>{{ context.username }}</td>
                         <td>{{ context.contact }}</td>
                         <td>{{ context.email }}</td>
+                        <td>{{ context.address }}</td>
+                  
                           <td>
                           <div class="dropdown">
                             <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                               <i class="bx bx-dots-vertical-rounded"></i>
                             </button>
                             <div class="dropdown-menu">
-                              <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-trash me-1"></i> Delete</a>
+                              <a class="dropdown-item" href="{% url "delete_player" context.id %}"><i class="bx bx-trash me-1"></i> Delete</a>
+                              <a class="dropdown-item" href="#"><i class='bx bx-block me-2'></i>Block</a>
+
                             </div>
                           </div>
                         </td>

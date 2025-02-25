@@ -40,6 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'playerapp', # Add the playerapp to the list of installed apps
     'adminapp', # Add the adminapp to the list of installed apps
+    "daphne",  # Django Channels ASGI Server
+    "channels",
+    "django.contrib.gis",  # For location-based features
+    "rest_framework",
+    "playerapp",
+    "adminapp",
 
 ]
 
@@ -71,7 +77,18 @@ TEMPLATES = [
     },
 ]
 
+AUTH_USER_MODEL = 'playerapp.User' # Set the custom user model
+
+
 WSGI_APPLICATION = 'SportifyX.wsgi.application'
+
+# Set up WebSockets backend
+ASGI_APPLICATION = "SportifyX.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # Change to Redis for production
+    }
+}
 
 
 # Database
@@ -135,3 +152,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#email setting
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'sportifyx04@gmail.com'
+EMAIL_HOST_PASSWORD = 'eczo xugd njek fpjj'
+# EMAIL_USE_SSL = False

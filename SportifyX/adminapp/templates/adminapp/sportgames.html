@@ -7,102 +7,127 @@
             <!-- Content -->
 
             <div class="container-xxl flex-grow-1 container-p-y">
-              <h3 class="fw-bold py-3 mb-4"> Add Venue </h3>
+              <h3 class="fw-bold py-3 mb-4"> Game List </h3>
             </div>
                     <div class="card-body">
                       <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="mb-3">
-                          <label class="form-label" for="basic-icon-default-fullname">Venue Name</label>
-                          <div class="input-group input-group-merge">
-                            <span id="basic-icon-default-fullname2" class="input-group-text"
-                              ><i class="bx bx-user"></i
-                            ></span>
+                          <label for="game-name" class="form-label">Game Name</label>
+                          <div class="input-group">
+                            <span class="input-group-text" id="game-name-icon">
+                              <i class="bx bx-joystick-alt"></i>
+                            </span>
                             <input
                               type="text"
                               class="form-control"
-                              id="basic-icon-default-fullname"
-                              placeholder="John Doe"
-                              aria-label="John Doe"
-                              aria-describedby="basic-icon-default-fullname2"
-                              name ="name"
+                              id="game-name"
+                              name="name"
+                              placeholder="Enter game name"
+                              aria-label="Game Name"
+                              aria-describedby="game-name-icon"
+                              required
                             />
                           </div>
+                          <div class="invalid-feedback">Please enter a game name.</div>
                         </div>
+                        
+                        
                         <div class="mb-3">
-                          <label class="form-label" for="basic-icon-default-company">Venue Address</label>
-                          <div class="input-group input-group-merge">
-                            <span id="basic-icon-default-company2" class="input-group-text"
-                              ><i class="bx bx-buildings"></i
-                            ></span>
-                            <input
-                              type="text"
-                              id="basic-icon-default-company"
+                          <label for="game-level" class="form-label">Game Level</label>
+                          <div class="input-group">
+                            <span class="input-group-text" id="game-level-icon">
+                              <i class="bx bx-layer"></i>
+                            </span>
+                            <select
+                              id="game-level"
                               class="form-control"
-                              placeholder="ACME Inc."
-                              aria-label="ACME Inc."
-                              aria-describedby="basic-icon-default-company2"
-                              name = "address"
-                            />
+                              name="level"
+                              aria-label="Game Level"
+                              aria-describedby="game-level-icon"
+                              required
+                            >
+                              <option value="" selected disabled>Select game level</option>
+                              <option value="beginner">Beginner</option>
+                              <option value="intermediate">Intermediate</option>
+                              <option value="advanced">Advanced</option>
+                            </select>
                           </div>
+                          <div class="invalid-feedback">Please select a game level.</div>
                         </div>
+                        
+                        
+
+
                         <div class="mb-3">
-                          <label class="form-label" for="basic-icon-default-phone">Contact</label>
-                          <div class="input-group input-group-merge">
-                            <span id="basic-icon-default-phone2" class="input-group-text"
-                              ><i class="bx bx-phone"></i
-                            ></span>
-                            <input
-                              type="tel"
-                              id="basic-icon-default-phone"
-                              class="form-control phone-mask"
-                              placeholder="658 799 8941"
-                              aria-label="658 799 8941"
-                              aria-describedby="basic-icon-default-phone2"
-                              name = "contact"
-                            />
-                          </div>
-                        </div>
-                        <div class="mb-3">
-                          <label class="form-label" for="basic-icon-default-email">City</label>
-                          <div class="input-group input-group-merge">
-                            <span class="input-group-text"><i class="bx bx-envelope"></i></span>
-                            <input
-                              type="text"
-                              id="basic-icon-default-email"
+                          <label for="game-category" class="form-label">Category</label>
+                          <div class="input-group">
+                            <span class="input-group-text" id="game-category-icon">
+                              <i class="bx bx-category"></i>
+                            </span>
+                            <select
+                              id="game-category"
                               class="form-control"
-                              placeholder="john.doe"
-                              aria-label="john.doe"
-                              aria-describedby="basic-icon-default-email2"
-                              name = "city"
-                            />
+                              name="category"
+                              aria-label="Game Category"
+                              aria-describedby="game-category-icon"
+                              required
+                            >
+                              <option value="" selected disabled>Select category</option>
+                              <option value="Single-player">Single Player</option>
+                              <option value="Multi-player">Multi Player</option>
+                              
+                            </select>
                           </div>
+                          <div class="invalid-feedback">Please select a category.</div>
+                        </div>
+                        
+                      
+                
                        
-                        </div>
+                        
                         <div class="mb-3">
-                          <label class="form-label" for="basic-icon-default-email">State</label>
-                          <div class="input-group input-group-merge">
-                            <span class="input-group-text"><i class="bx bx-envelope"></i></span>
-                            <input
-                              type="text"
-                              id="basic-icon-default-email"
-                              class="form-control"
-                              placeholder="john.doe"
-                              aria-label="john.doe"
-                              aria-describedby="basic-icon-default-email2"
-                              name = "state"
+                          <label for="game-image" class="form-label">Game Image</label>
+                          <div class="input-group">
+                            <span class="input-group-text" id="game-image-icon">
+                              <i class="bx bx-image"></i>
+                            </span>
+                            <input 
+                              type="file" 
+                              name="image" 
+                              class="form-control" 
+                              id="game-image" 
+                              accept="image/*" 
+                              aria-label="Upload Game Image"
+                              aria-describedby="game-image-icon"
+                              required
                             />
                           </div>
-                       
+                          <div class="invalid-feedback">Please upload a game image.</div>
                         </div>
-                        <div class="mb-3">
-                          <label class="form-label" for="basic-icon-default-message">Upload Image</label>
-                          <div class="input-group input-group-merge">
-                          <input type = "file" name = "image" class="form-control" id="basic-icon-default-message" placeholder="Message" aria-label="Message" aria-describedby="basic-icon-default-message2"/>
+                        
+                   
+                        {% comment %} <div class="mb-3">
+                          <label for="game-rules" class="form-label">Rules</label>
+                          <div class="input-group">
+                            <span class="input-group-text"><i class="bx bx-list-check"></i></span>
+                            <textarea
+                              id="game-rules"
+                              class="form-control"
+                              name="rules"
+                              placeholder="Enter game rules here..."
+                              aria-label="Game Rules"
+                              rows="4"
+                              required
+                            ></textarea>
                           </div>
+                          <div class="invalid-feedback">Please enter the game rules.</div>
                         </div>
+                         {% endcomment %}
+
                         <button type="submit" class="btn btn-primary">Submit</button>
                       </form>
+                    </div>
                     </div>
                   </div>
                 </div>
@@ -129,15 +154,13 @@
                     href="https://themeselection.com/demo/sneat-bootstrap-html-admin-template/documentation/"
                     target="_blank"
                     class="footer-link me-4"
-                    >Documentation</a
-                  >
+                    >Documentation</a>
 
                   <a
                     href="https://github.com/themeselection/sneat-html-admin-template-free/issues"
                     target="_blank"
                     class="footer-link me-4"
-                    >Support</a
-                  >
+                    >Support</a>
                 </div>
               </div>
             </footer>
@@ -155,14 +178,7 @@
     </div>
     <!-- / Layout wrapper -->
 
-    <div class="buy-now">
-      <a
-        href="https://themeselection.com/products/sneat-bootstrap-html-admin-template/"
-        target="_blank"
-        class="btn btn-danger btn-buy-now"
-        >Upgrade to Pro</a
-      >
-    </div>
+   
 
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->

@@ -1,0 +1,54 @@
+{% extends "adminapp/admin-master.html" %}
+{% load static %}
+{% block content %}
+
+<div class="content-wrapper">
+  <div class="container-xxl flex-grow-1 container-p-y">
+    <h3 class="fw-bold py-3 mb-4"> Add Game Category </h3>
+  </div>
+
+  <div class="card-body">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- Game Selection Dropdown -->
+      <div class="mb-3">
+        <label class="form-label" for="game-input">Add Game</label>
+        <div class="input-group input-group-merge">
+            <span class="input-group-text">
+                <i class="bx bx-game"></i>
+            </span>
+            <input list="game-options" class="form-control" id="game-input" name="game_name" placeholder="Select or type a game" required>
+            <datalist id="game-options">
+                <option value="Cricket">
+                <option value="Football">
+                <option value="Volleyball">
+                <option value="Tennis">
+                <option value="Table Tennis">
+                <option value="Badminton">
+                <option value="Running">
+            </datalist>
+        </div>
+    </div>
+    
+
+      <!-- Description -->
+      <div class="mb-3">
+        <label class="form-label" for="game-description">Game Description</label>
+        <textarea class="form-control" id="game-description" placeholder="Enter game description" name="description" rows="4" required></textarea>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="mb-3">
+        <label class="form-label" for="game-image">Upload Image</label>
+        <div class="input-group input-group-merge">
+          <input type="file" name="image" class="form-control" id="game-image" accept="image/*" required />
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</div>
+
+{% endblock  %}

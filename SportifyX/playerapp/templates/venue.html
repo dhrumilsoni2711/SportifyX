@@ -1,0 +1,58 @@
+{% extends "master.html" %}
+{% load static %}
+{% block content %}
+
+<div class="p-5">
+    <div class="container mt-4 pt-5">
+        <div class="d-flex w-full align-items-center justify-content-between">
+            <h2 class="mb-4">Available Venues</h2>
+
+            <!-- Search and Filter Form -->
+            <form action="{% url 'search_results' %}" method="GET" class="d-flex me-3 w-50">
+                <input type="text" name="q" class="form-control w-100 bg-dark border-0 text-white" 
+                       placeholder="Search venues..." value="{{ request.GET.q }}">
+
+                <!-- City Dropdown -->
+                <select name="city" class="form-select ms-2">
+                    <option value="">All Cities</option>
+                    {% for city in unique_cities %}
+                        <option value="{{ city }}" {% if request.GET.city == city %}selected{% endif %}>{{ city }}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- Status Dropdown -->
+                <select name="status" class="form-select ms-2">
+                    <option value="">All</option>
+                    <option value="1" {% if request.GET.status == "1" %}selected{% endif %}>Bookable</option>
+                    <option value="0" {% if request.GET.status == "0" %}selected{% endif %}>Not Bookable</option>
+                </select>
+
+                <button type="submit" class="btn btn-outline-light ms-2">Filter</button>
+            </form>
+        </div>
+<
+        <div class="row mt-3" >
+            {% for venue in data %}
+            <div class="col-md-4 p-3">
+                <a href="{% url "venue_detail" venue.id %}"> 
+                    <div class="card venue-card position-relative">
+                        <img src="{{venue.image.url}}" class="card-img-top venue-img" alt="Venue Image">
+                        <span class="bookable">
+                            {% if venue.status %}Bookable{% else %}Not Bookable{% endif %}
+                        </span>
+                        <div class="card-body">
+                            <h5 class="card-title">{{venue.name}}</h5>
+                            <p class="card-text">{{venue.city}}</p>
+                            <p class="card-text text-warning">&#9733; 2.82 (11)</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <p>No venues found.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

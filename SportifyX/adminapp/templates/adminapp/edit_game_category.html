@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Game Category</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+        }
+        .form-control {
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .btn-primary {
+            width: 100%;
+            background-color: #007bff;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .form-group img {
+            max-width: 100px;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Edit Game Category</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+        
+            <!-- Read-Only Category ID -->
+            <div class="mb-3">
+                <label for="category_id" class="form-label">Category ID</label>
+                <input type="text" class="form-control" id="category_id" value="{{ form.instance.id }}" readonly>
+            </div>
+        
+            <!-- Game Name -->
+            <div class="mb-3">
+                <label for="game_name" class="form-label">Game Name</label>
+                <input type="text" class="form-control" name="game_name" id="game_name" value="{{ form.game_name.value }}" required>
+            </div>
+        
+            <!-- Description -->
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" name="description" id="description" rows="3" required>{{ form.description.value }}</textarea>
+            </div>
+        
+            <!-- Image Upload -->
+            <div class="mb-3">
+                <label for="image" class="form-label">Upload Image</label>
+                <input type="file" class="form-control" name="image" id="image">
+                {% if form.instance.image %}
+                    <img src="{{ form.instance.image.url }}" alt="Current Image" style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px; margin-top: 10px;">
+                {% endif %}
+            </div>
+        
+            <!-- Buttons Section -->
+            <button type="submit" class="btn btn-primary d-grid w-100">Save Changes</button>
+        
+        <div class="text-center mt-3">
+            <a href="{% url 'gamecategory' %}" class="d-flex align-items-center justify-content-center">
+                <i class="bx bx-chevron-left scaleX-n1-rtl bx-sm"></i>
+                Back to Game Category
+            </a>
+        </div>
+        </form>
+</div>
+</body>
+</html>
