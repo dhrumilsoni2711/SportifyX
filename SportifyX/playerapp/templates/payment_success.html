@@ -1,0 +1,131 @@
+{% extends 'master.html' %}
+{% block content %}
+
+<!-- Payment Success Page Styles -->
+<style>
+    /* General Container Styling */
+    .success-container {
+        max-width: 500px;
+        margin: auto;
+        padding: 30px;
+        text-align: center;
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Success Icon */
+    .success-icon {
+        font-size: 60px;
+        color: #28a745;
+        animation: popIn 0.5s ease-in-out;
+    }
+
+    /* Success Text */
+    .success-text {
+        font-size: 24px;
+        font-weight: bold;
+        color: #222;
+        margin-top: 10px;
+    }
+
+    /* Information Text */
+    .info-text {
+        font-size: 16px;
+        color: #555;
+        margin-top: 10px;
+    }
+
+    /* Booking Details Box */
+    .details-box {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 6px;
+        margin-top: 20px;
+        text-align: left;
+        box-shadow: inset 0px 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Booking Details Labels */
+    .details-box p {
+        font-size: 16px;
+        color: #333;
+        margin: 5px 0;
+    }
+
+    .details-box strong {
+        color: #007bff;
+    }
+
+    /* Button Group */
+    .button-group {
+        margin-top: 25px;
+    }
+
+    .btn-home, .btn-bookings {
+        display: inline-block;
+        padding: 12px 25px;
+        margin: 5px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .btn-home {
+        background: #007bff;
+        color: white;
+    }
+
+    .btn-home:hover {
+        background: #0056b3;
+    }
+
+    .btn-bookings {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-bookings:hover {
+        background: #218838;
+    }
+
+    /* Animation */
+    @keyframes popIn {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+</style>
+
+<!-- Payment Success Container -->
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+    <div class="success-container">
+        <div class="success-icon">✅</div>
+        <div class="success-text">Payment Successful!</div>
+        <p class="info-text">Thank you for booking. Your payment has been received.</p>
+
+        <!-- Booking Details -->
+        <div class="details-box">
+            <p><strong>Booking ID:</strong> {{ booking_id }}</p>
+            <p><strong>Order ID:</strong> {{ order_id }}</p>
+            <p><strong>Venue Name:</strong> {{ venue_name }}</p>
+            <p><strong>Transaction ID:</strong> {{ transaction_id }}</p>
+            <p><strong>Price:</strong> ₹{{ price }}</p>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="button-group">
+            <a href="{% url 'index' %}" class="btn-home">🏠 Go to Home</a>
+            {% comment %} <a href="{% url 'user_bookings' %}" class="btn-bookings">📋 View Bookings</a> {% endcomment %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "adminapp/admin-master.html" %}
+{% load static %}
+
+{% block title %}Set Venue Game Price{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <h3 class="fw-bold py-3 mb-4">Set Venue Game Price</h3>
+    </div>
+
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <!-- Venue Selection -->
+            <div class="mb-3">
+                <label class="form-label" for="venue">Select Venue:</label>
+                <select id="venue" name="venue" class="form-control" onchange="this.form.submit()">
+                    <option value="">-- Select Venue --</option>
+                    {% for venue in venues %}
+                        <option value="{{ venue.id }}" {% if selected_venue and selected_venue.id == venue.id %}selected{% endif %}>
+                            {{ venue.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Game Category Selection -->
+            <div class="mb-3">
+                <label class="form-label" for="game">Select Game:</label>
+                <select id="game" name="game" class="form-control" onchange="this.form.submit()">
+                    <option value="">-- Select Game --</option>
+                    {% for game in games %}
+                        <option value="{{ game.game_category.id }}" {% if selected_game and selected_game.game_category.id == game.game_category.id %}selected{% endif %}>
+                            {{ game.game_category.game_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Price Input -->
+            <div class="mb-3">
+                <label class="form-label" for="price">Price Per Hour (₹):</label>
+                <input type="number" id="price" name="price" class="form-control" step="0.01" placeholder="Enter price" value="{{ price }}" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Price</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+

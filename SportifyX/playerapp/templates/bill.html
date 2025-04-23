@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Invoice</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            padding: 40px;
+        }
+
+        .invoice-container {
+            max-width: 700px;
+            background: #fff;
+            margin: auto;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .invoice-header {
+            text-align: center;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .invoice-header img {
+            width: 120px;
+        }
+
+        .invoice-header h2 {
+            font-size: 24px;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .invoice-header p {
+            font-size: 14px;
+            color: #555;
+            margin: 2px 0;
+        }
+
+        .invoice-details {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #444;
+        }
+
+        .invoice-details p {
+            margin: 3px 0;
+        }
+
+        .invoice-table th, .invoice-table td {
+            vertical-align: middle;
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .invoice-table th {
+            background: #2C3E50;
+            color: white;
+            font-weight: normal;
+        }
+
+        .total-amount {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2C3E50;
+            text-align: right;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .btn-print {
+            display: block;
+            margin: 20px auto;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .payment-confirmation {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: green;
+            margin-top: 15px;
+        }
+
+        .payment-failed {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: red;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="invoice-container">
+        <!-- Invoice Header -->
+        <div class="invoice-header">
+            <img src="{% static 'ecommers/images/logo.png' %}" alt="Company Logo">
+            <h2>SportifyX</h2>
+            <h3>Booking Invoice</h3>
+            <p>Corporate Office: 202, Dev Arc, Opp. Iskcon Temple, S.G. Highway, Ahmedabad, Gujarat, India, 380015.</p>
+            <p>Phone: 82002 25200 | Email: sportifyx04@gmail.com</p>
+        </div>
+
+        <!-- Invoice Details -->
+        <div class="invoice-details">
+            <p><strong>Invoice Date:</strong> {{ order.generated_at }} IST</p>
+            <p><strong>Player Name:</strong> {{ order.username }}</p>
+            <p><strong>Booking Date:</strong> {{ order.date }}</p>
+            <p><strong>Venue:</strong> {{ order.venue }}</p>
+        </div>
+
+        <!-- Booking Summary -->
+        <div class="table-responsive">
+            <table class="table invoice-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sport</td>
+                        <td>{{ order.sport }}</td>
+                    </tr>
+                    <tr>
+                        <td>Date & Time</td>
+                        <td>{{ order.date }} | {{ order.start_time }}</td>
+                    </tr>
+                    <tr>
+                        <td>Duration</td>
+                        <td>{{ order.duration }} hour(s)</td>
+                    </tr>
+                    <tr>
+                        <td>Payment Status</td>
+                        <td><strong>{{ order.payment_status }}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Total Amount -->
+        <p class="total-amount">Total Price: ₹{{ order.total_price }}</p>
+
+        <!-- Payment Confirmation -->
+        {% if order.payment_status == "Paid" %}
+            <p class="payment-confirmation"> Payment Received Successfully via Online Mode.</p>
+        {% else %}
+            <p class="payment-failed"> Payment Failed or Pending. Please contact support.</p>
+        {% endif %}
+
+        <!-- Payment & Thank You Note -->
+    
+        <p class="footer-text">Thank you for booking with SportifyX. Enjoy your game!</p>
+    </div>
+
+</body>
+
+</html>

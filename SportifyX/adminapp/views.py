@@ -13,6 +13,7 @@ from .models import VisitorCounter
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
 
+
 def adminindex(request):
     return render(request, 'adminapp/adminindex.html') # Path: SportifyX/templates/adminindex.html
 
@@ -23,9 +24,11 @@ def addvenue(request):
     return render(request, 'adminapp/addvenue.html') # Path: SportifyX/templates/formvertical.html
 
 def usertable(request):
-    data = models.User.objects.filter(role="player")
-    context = {'data':data}
-    return render(request, 'adminapp/usertable.html',context=context) # Path: SportifyX/templates/tablesbasic.html
+    data = models.User.objects.filter(role="player").values(
+        'id', 'username', 'contact', 'email', 'address', 'latitude', 'longitude'
+    )
+    context = {'data': data}
+    return render(request, 'adminapp/usertable.html', context)
 
 def adminlogin(request):
 
@@ -49,50 +52,50 @@ def venuetable(request):
     context = {'data': data}
     return render(request, 'adminapp/venuetable.html', context)
 
-# def addvenue(request): 
-#     form = forms.VenueListForm(request.POST or None, request.FILES or None)
-#     venue_game_form = forms.VenueGamesform(request.POST or None)
-#     game_data = AdminModel.Game_Category_List.objects.all()  # Use direct model reference instead of AdminModel
+def delete_venue(request, venue_id):
+    venue = get_object_or_404(AdminModel.VenueList, id=venue_id)
+    venue.delete()
+    return redirect('venue_list') 
 
-#     context = {
-#         "form": form,
-#         "venue_game_form": venue_game_form,
-#         "game_data": game_data
-#     }
+def addvenuedetail(request):
+    venues = AdminModel.VenueList.objects.filter(status=True)  # Fetch only active venues
 
-#     if request.method == "POST":
-#         if form.is_valid() and venue_game_form.is_valid():
-#             form_obj = form.save(commit=False)
-#             form_obj.status = True  
-#             form_obj.save()
+    if request.method == 'POST':
+        venue_id = request.POST.get('venue_id')  
+        venue_description = request.POST.get('venue_description', '').strip()
+        venue_amenities = request.POST.getlist('venue_amenities')  
+        opening_time = request.POST.get('opening_time')
+        closing_time = request.POST.get('closing_time')
 
-#             venue_game_obj = venue_game_form.save(commit=False)
-#             venue_game_obj.venue = form_obj  
+        print("Venue ID received:", venue_id)  # Debugging
 
-#             game_category_id = request.POST.getlist('game_category')
-#             for ab in game_category_id:
-#                 venue_game = AdminModel.VenueGames.objects.create(game_category=game_category_id)
-#             if game_category_id:
-#                     game_category = AdminModel.Game_Category_List.objects.get(id=game_category_id)
-#                     venue_game_obj.game_category = game_category.game_name
-#                     venue_game_obj.save()
-#                     messages.success(request, "Venue added successfully!")
-#                     return redirect('venuetable')
-#             else:
-#                 messages.error(request, "No game category selected.")
-#                 return HttpResponse("Game category is required")
+        try:
+            venue = AdminModel.VenueList.objects.get(id=venue_id)
+        except AdminModel.VenueList.DoesNotExist:
+            messages.error(request, "Selected venue does not exist.")
+            return redirect('addvenuedetail')  
 
-#         else:
-#             print(form.errors)
-#             print(venue_game_form.errors)
-#             return HttpResponse("Form is not valid")
+        if AdminModel.VenueDetails.objects.filter(venue=venue).exists():
+            messages.error(request, "This venue already has details.")
+            return redirect('addvenuedetail')
 
-#     return render(request, "adminapp/addvenue.html", context)
+        AdminModel.VenueDetails.objects.create(
+            venue=venue,
+            venue_description=venue_description,
+            venue_amenities=venue_amenities,
+            opening_time=opening_time,   # Save new fields
+            closing_time=closing_time    # Save new fields
+        )
+
+        messages.success(request, "Venue details added successfully!")
+        return redirect('/adminapp/addvenuedetail')
+
+    return render(request, 'adminapp/addvenue_detail.html', {'venues': venues})
 
 
 def addvenue(request): 
     form = forms.VenueListForm(request.POST or None, request.FILES or None)
-    game_data = AdminModel.Game_Category_List.objects.all()  # Fetch game categories from the database
+    game_data = AdminModel.Game_Category_List.objects.all()
 
     context = {
         "form": form,
@@ -101,41 +104,44 @@ def addvenue(request):
 
     if request.method == "POST":
         if form.is_valid():
-            # Save venue
             venue_obj = form.save(commit=False)
             venue_obj.status = True  
             venue_obj.save()
 
-            # Get the selected game category IDs (comma-separated)
-            game_category_ids = request.POST.get('games', '').split(',')
-            game_category_ids = [int(id.strip()) for id in game_category_ids if id.strip().isdigit()]
+            game_names = request.POST.getlist("games")
+            print("game_names",game_names)
+            game_numbers = [int(num) for num in game_names[0].split(', ')]
 
-            if game_category_ids:
-                # Create VenueGames for each selected game category
-                for game_category_id in game_category_ids:
-                    try:
-                        game_category = AdminModel.Game_Category_List.objects.get(id=game_category_id)
-                        AdminModel.VenueGames.objects.create(
-                            venue=venue_obj,
-                            game_category=game_category
-                        )
-                    except AdminModel.Game_Category_List.DoesNotExist:
-                        messages.error(request, f"Game category with ID {game_category_id} not found.")
-                        return redirect('addvenue')
-
-                messages.success(request, "Venue and game categories added successfully!")
-                return redirect('venuetable')
-            else:
-                messages.error(request, "Please select at least one game category.")
-                return redirect('addvenue')
-
-        else:
-            messages.error(request, "Form submission failed. Please check the errors below.")
-            context["form_errors"] = form.errors
+            for num in game_numbers:
+                print(num)
+                try:
+                    # print("startdfdgfgf")
+                    game_category = AdminModel.Game_Category_List.objects.get(id=num)
+                    # print("ererere")
+                    AdminModel.VenueGames.objects.create(venue=venue_obj, game_category=game_category)
+                except AdminModel.Game_Category_List.DoesNotExist:
+                    continue  # Skip if game name is invalid
+            
+            messages.success(request, "Venue and game categories added successfully!")
+            return redirect('venuetable')
 
     return render(request, "adminapp/addvenue.html", context)
 
 
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+from .models import VenueList
+
+@csrf_exempt  # Remove this if using proper CSRF tokens in AJAX
+def toggle_venue_status(request, venue_id):
+    if request.method == "POST":
+        venue = get_object_or_404(VenueList, id=venue_id)
+        venue.status = not venue.status  # Toggle status
+        venue.save()
+        return JsonResponse({"success": True, "status": venue.status})
+    
+    return JsonResponse({"success": False, "error": "Invalid request"})
 
 
 
@@ -208,5 +214,56 @@ def dashboard(request):
     total_visitors = VisitorCounter.objects.count()  # Get total unique visitors
 
     return render(request, "adminapp/adminindex.html", {"visitor_count": total_visitors})
+
+
+def venue_game_price_view(request):
+    """
+    Handle venue-game price setting and display filtered games without AJAX.
+    """
+    venues = VenueList.objects.all()
+    games = []
+    selected_venue = None
+    selected_game = None
+    price = ""
+
+    if request.method == "POST":
+        venue_id = request.POST.get("venue")
+        game_id = request.POST.get("game")
+        price = request.POST.get("price")
+
+        # Ensure price is converted to a valid float
+        try:
+            price = float(price) if price else None
+        except ValueError:
+            price = None  # Prevent errors from invalid price input
+
+        # If venue is selected, fetch games
+        if venue_id:
+            selected_venue = get_object_or_404(VenueList, id=venue_id)
+            games = AdminModel.VenueGames.objects.filter(venue=selected_venue).select_related("game_category")
+
+        # If game is selected, fetch price
+        if venue_id and game_id:
+            selected_game = AdminModel.VenueGames.objects.filter(venue_id=venue_id, game_category_id=game_id).first()
+            price_entry = AdminModel.VenueGamePrice.objects.filter(venue_id=venue_id, game_category_id=game_id).first()
+            if price_entry:
+                price = price_entry.price_per_hour
+
+        # Save or update price only if price is valid
+        if venue_id and game_id and price is not None:
+            AdminModel.VenueGamePrice.objects.update_or_create(
+                venue_id=venue_id, game_category_id=game_id,
+                defaults={"price_per_hour": price}
+            )
+            return redirect("venue_game_price_view")  # Refresh the page after submission
+
+    return render(request, "adminapp/venue_game_price.html", {
+        "venues": venues,
+        "games": games,
+        "selected_venue": selected_venue,
+        "selected_game": selected_game,
+        "price": price or "",
+    })
+
 
 

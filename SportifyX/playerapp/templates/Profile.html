@@ -2,122 +2,239 @@
 {% load static %}
 {% block content %}
 
+<div class="container bootstrap snippets bootdey p-5 bg-dark text-light">
+    <div class="p-5 d-flex gap-5">
+        <!-- Sidebar Navigation -->
+        <div class="profile-nav col-md-3">
+            <div class="panel bg-secondary rounded shadow-lg">
+                <div class="user-heading round text-center p-3">
+                    <a href="#">
+                        <img class="rounded-circle border border-light" src="https://img.freepik.com/premium-photo/flat-icon-isolated-background_1375069-5555.jpg?ga=GA1.1.25006794.1721460010&semt=ais_hybrid_sidr" alt="" width="100">
+                    </a>
+                    <h1 class="text-white">{{ request.user.username }}</h1>
+                    <p class="text-light">{{ request.user.email }}</p>
+                </div>
+                <ul class="list-group bg-dark text-light">
+                    <li class="list-group-items pt-2">
+                        <a href="#" class="text-light" onclick="showSection('profile-section')"> <i class="fa fa-user"></i> Profile</a>
+                    </li>
+                    <li class="list-group-items pt-2">
+                        <a href="#" class="text-light" onclick="showSection('edit-profile-section')"> <i class="fa fa-edit"></i> Edit Profile</a>
+                    </li>
+                    <!-- ✅ Add Friends List Link in Sidebar -->
+                    <li class="list-group-items pt-2">
+                        <a href="#" class="text-light" onclick="showSection('friends-list-section')"> <i class="fa fa-users"></i> My Friends List</a>
+                    </li>
+                    <li class="list-group-items pt-2">
+                        <a href="#" class="text-light" onclick="showSection('host-games-section')"> <i class="fa fa-trophy"></i> Host Games</a>
+                    </li>
+                    <li class="list-group-items pt-2">
+                        <a href="#" class="text-light" onclick="showSection('bookings-section')"> <i class="fa fa-calendar"></i> All Bookings </a>
+                    </li>
 
-<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-<div class="container bootstrap snippets bootdey p-5">
-    <div class="row p-5 d-flex gap-5">
-    <div class="profile-nav col-md-3">
-        <div class="panel">
-            <div class="user-heading round">
-                <a href="#">
-                
-                    <img src="https://img.freepik.com/premium-photo/flat-icon-isolated-background_1375069-5555.jpg?ga=GA1.1.25006794.1721460010&semt=ais_hybrid_sidr" alt="">
-                </a>
-                <h1>{{request.user}}</h1>
-                <p>{{request.user.email}}</p>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="profile-info col-md-9">
+            
+            <!-- ✅ Display Success Message -->
+            {% if messages %}
+                <div class="alert alert-success" role="alert">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- ✅ Profile Section (Default Visible) -->
+            <div id="profile-section">
+                <div class="panel bg-secondary p-4 rounded shadow-lg">        
+                    <div class="panel-body bio-graph-info">
+                        <h1 class="text-light">Profile Details</h1>
+                        <div class="row">
+                            <div class="bio-row">
+                                <p class="border border-warning p-2 text-light"><span>First Name:</span> {{ request.user.first_name }}</p>
+                            </div>
+                            <div class="bio-row">
+                                <p class="border border-warning p-2 text-light"><span>Last Name:</span> {{ request.user.last_name }}</p>
+                            </div>
+                            <div class="bio-row">
+                                <p class="border border-warning p-2 text-light"><span>Email:</span> {{ request.user.email }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <ul class="nav nav-pills nav-stacked">
-                <li class="pt-2"><a href="#"> <i class="fa fa-user"></i> Profile</a></li>
-                <li class="pt-2"><a href="#"> <i class="fa fa-calendar"></i> Recent Activity <span class="label label-warning pull-right r-activity"></span></a></li>
-                <li class="pt-2"><a href="#"> <i class="fa fa-edit"></i> Edit profile</a></li>
-            </ul>
-        </div>
-    </div>
-    <div class="profile-info col-md-9">
-        <div class="panel">        
-            <div class="panel-body bio-graph-info">
-                <h1>Bio Graph</h1>
-                <div class="row">
-                    <div class="bio-row">
-                        <p class="border border-warning p-2"><span>First Name </span>: {{request.user.username}}</p>
-                    </div>
-                    <div class="bio-row">
-                        <p class="border border-warning p-2"><span>Last Name </span>: {{Smith}}</p>
-                    </div>
-                    <div class="bio-row">
-                        <p class="border border-warning p-2"><span>Gender </span>: {{request.user.gender}}</p>
-                    </div>
-                    <div class="bio-row">
-                        <p class="border border-warning p-2"><span>Contact </span>: {{request.user.contact}}</p>
-                    </div>
-                    <div class="bio-row">
-                        <p class="border border-warning p-2"><span>Occupation </span>: UI Designer</p>
-                    </div>
-                    <div class="bio-row">
-                        <p class="border border-warning p-2"><span>Phone </span>: 88 (02) 123456</p>
-                    </div>
-                    <div class="bio-row">
-                        <p class="border border-warning p-2"><span>Email </span>: {{request.user.email}}</p>
-                    </div>
-                    <div class="bio-row">
-                        <p class="border border-warning p-2"><span>Address</span>: {{request.user.address}}</p>
+            <!-- ✅ Edit Profile Section -->
+            <div id="edit-profile-section" style="display: none;">
+                <div class="panel bg-secondary p-4 rounded shadow-lg">
+                    <div class="panel-body">
+                        <h1 class="text-light">Edit Profile</h1>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="text-light">First Name</label>
+                                <input type="text" class="form-control bg-dark text-light" name="first_name" value="{{ request.user.first_name }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-light">Last Name</label>
+                                <input type="text" class="form-control bg-dark text-light" name="last_name" value="{{ request.user.last_name }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-light">Email</label>
+                                <input type="email" class="form-control bg-dark text-light" name="email" value="{{ request.user.email }}" required>
+                            </div>
+                            <button type="submit" class="btn btn-warning mt-2">Save Changes</button>
+                        </form>
                     </div>
                 </div>
             </div>
-        </div>
-        <div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="panel">
-                        <div class="panel-body">
-                            <div class="bio-chart">
-                                <div style="display:inline;width:100px;height:100px;"><canvas width="100" height="100px"></canvas><input class="knob" data-width="100" data-height="100" data-displayprevious="true" data-thickness=".2" value="35" data-fgcolor="#e06b7d" data-bgcolor="#e8e8e8" style="width: 54px; height: 33px; position: absolute; vertical-align: middle; margin-top: 33px; margin-left: -77px; border: 0px; font-weight: bold; font-style: normal; font-variant: normal; font-stretch: normal; font-size: 20px; line-height: normal; font-family: Arial; text-align: center; color: rgb(224, 107, 125); padding: 0px; -webkit-appearance: none; background: none;"></div>
-                            </div>
-                            <div class="bio-desk">
-                                <h4 class="red">Envato Website</h4>
-                                <p>Started : 15 July</p>
-                                <p>Deadline : 15 August</p>
-                            </div>
+
+                <!-- ✅ My Friends List Section -->
+            <div id="friends-list-section" style="display: none;">
+                <h2 class="text-light">👥 My Friends List (Accepted Players)</h2>
+
+                {% if accepted_players %}
+                    <div class="card mt-3 bg-dark text-light shadow-lg">
+                        <div class="card-header bg-info text-white">
+                            <h4>Accepted Players</h4>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                {% for player in accepted_players %}
+                                    <li class="list-group-item bg-dark text-white d-flex align-items-center">
+                                        {% if player.profile_image %}
+                                            <img src="{{ player.profile_image.url }}" class="rounded-circle border border-light" width="40" height="40">
+                                        {% else %}
+                                            <img src="{% static 'images/boy.png' %}" class="rounded-circle border border-light" width="40" height="40">
+                                        {% endif %}
+                                        <span class="ms-3">{{ player.username }}</span>
+                                        <a href="{% url 'chat' player.id %}" class="btn btn-sm btn-secondary ms-auto">💬 Chat</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel">
-                        <div class="panel-body">
-                            <div class="bio-chart">
-                                <div style="display:inline;width:100px;height:100px;"><canvas width="100" height="100px"></canvas><input class="knob" data-width="100" data-height="100" data-displayprevious="true" data-thickness=".2" value="63" data-fgcolor="#4CC5CD" data-bgcolor="#e8e8e8" style="width: 54px; height: 33px; position: absolute; vertical-align: middle; margin-top: 33px; margin-left: -77px; border: 0px; font-weight: bold; font-style: normal; font-variant: normal; font-stretch: normal; font-size: 20px; line-height: normal; font-family: Arial; text-align: center; color: rgb(76, 197, 205); padding: 0px; -webkit-appearance: none; background: none;"></div>
-                            </div>
-                            <div class="bio-desk">
-                                <h4 class="terques">ThemeForest CMS </h4>
-                                <p>Started : 15 July</p>
-                                <p>Deadline : 15 August</p>
-                            </div>
+                {% else %}
+                    <div class="alert alert-warning text-center">No accepted friends yet.</div>
+                {% endif %}
+            </div>
+
+
+
+            
+            <!-- ✅ Host Games Section -->
+            <div id="host-games-section" style="display: none;">
+                <h2 class="text-light">🏟 Hosted Games</h2>
+
+                {% if hosted_games %}
+                    <div class="card mt-3 bg-dark text-light shadow-lg">
+                        <div class="card-header bg-primary text-white">
+                            <h4>Your Hosted Games</h4>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-dark table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Game</th>
+                                        <th>Venue</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Required Players</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for game in hosted_games %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ game.game_category.game_name }}</td>
+                                            <td>{{ game.venue.name }}</td>
+                                            <td>{{ game.date }}</td>
+                                            <td>{{ game.time }}</td>
+                                            <td>{{ game.required_players }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel">
-                        <div class="panel-body">
-                            <div class="bio-chart">
-                                <div style="display:inline;width:100px;height:100px;"><canvas width="100" height="100px"></canvas><input class="knob" data-width="100" data-height="100" data-displayprevious="true" data-thickness=".2" value="75" data-fgcolor="#96be4b" data-bgcolor="#e8e8e8" style="width: 54px; height: 33px; position: absolute; vertical-align: middle; margin-top: 33px; margin-left: -77px; border: 0px; font-weight: bold; font-style: normal; font-variant: normal; font-stretch: normal; font-size: 20px; line-height: normal; font-family: Arial; text-align: center; color: rgb(150, 190, 75); padding: 0px; -webkit-appearance: none; background: none;"></div>
-                            </div>
-                            <div class="bio-desk">
-                                <h4 class="green">VectorLab Portfolio</h4>
-                                <p>Started : 15 July</p>
-                                <p>Deadline : 15 August</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel">
-                        <div class="panel-body">
-                            <div class="bio-chart">
-                                <div style="display:inline;width:100px;height:100px;"><canvas width="100" height="100px"></canvas><input class="knob" data-width="100" data-height="100" data-displayprevious="true" data-thickness=".2" value="50" data-fgcolor="#cba4db" data-bgcolor="#e8e8e8" style="width: 54px; height: 33px; position: absolute; vertical-align: middle; margin-top: 33px; margin-left: -77px; border: 0px; font-weight: bold; font-style: normal; font-variant: normal; font-stretch: normal; font-size: 20px; line-height: normal; font-family: Arial; text-align: center; color: rgb(203, 164, 219); padding: 0px; -webkit-appearance: none; background: none;"></div>
-                            </div>
-                            <div class="bio-desk">
-                                <h4 class="purple">Adobe Muse Template</h4>
-                                <p>Started : 15 July</p>
-                                <p>Deadline : 15 August</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% else %}
+                    <div class="alert alert-warning text-center">You haven't hosted any games yet.</div>
+                {% endif %}
+            </div>
+
+            <!-- ✅ Bookings Section -->
+             <!-- ✅ Bookings Section -->
+<div id="bookings-section" style="display: none;">
+    <h2 class="text-light">All Bookings</h2>
+
+    {% if current_bookings or past_bookings %}
+        <div class="card mt-3 bg-dark text-light shadow-lg">
+            <div class="card-header bg-success text-white d-flex justify-content-between">
+                <h4>Current Bookings</h4>
+            </div>
+            <div class="card-body">
+                {% if current_bookings %}
+                    <table class="table table-dark table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Venue</th>
+                                <th>Game Category</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Duration</th>
+                                <th>Payment Status</th>
+                                <th>Receipt</th> <!-- ✅ New Column for Download Receipt -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in current_bookings %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ booking.venue }}</td>
+                                    <td>{{ booking.game_category }}</td>
+                                    <td>{{ booking.date }}</td>
+                                    <td>{{ booking.start_time }}</td>
+                                    <td>{{ booking.duration }} hour(s)</td>
+                                    <td>{{ booking.payment_status }}</td>
+                                    <td>
+                                        <!-- ✅ Download Receipt Button -->
+                                        <a href="{% url 'download_receipt' booking.id %}" class="btn btn-warning btn-sm">
+                                            📄 Download
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="alert alert-warning text-center">No current bookings available.</div>
+                {% endif %}
             </div>
         </div>
-    </div>
+    {% else %}
+        <div class="alert alert-warning text-center">You haven't made any bookings yet.</div>
+    {% endif %}
+</div>
+
+        </div>
     </div>
 </div>
+
+<!-- ✅ JavaScript to Toggle Sections -->
+<script>
+    function showSection(sectionId) {
+        document.getElementById("profile-section").style.display = "none";
+        document.getElementById("edit-profile-section").style.display = "none";
+        document.getElementById("host-games-section").style.display = "none";
+        document.getElementById("bookings-section").style.display = "none";
+        document.getElementById(sectionId).style.display = "block";
+    }
+</script>
 
 {% endblock %}

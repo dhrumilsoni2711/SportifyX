@@ -1,33 +1,33 @@
-{% extends 'master.html' %} {% load static %} {% block content %}
+{% extends "master.html" %}
+{% load static %}
+{% block content %}
 
-<div class="container p-5">
-  <h2 class="pt-5">Search Results for "{{ query }}"</h2>
-  
-  {% if venues %}
-  <h3 class="mt-4">Venues</h3>
-  <div class="row">
-    {% for venue in venues %}
-    <div class="col-md-4 p-3">
-      <div class="card venue-card position-relative">
-        <img
-          src="{{venue.image.url}}"
-          class="card-img-top venue-img"
-          alt="Venue Image"
-        />
-        <span class="bookable">Bookable</span>
-        <div class="card-body">
-          <h5 class="card-title">{{venue.name}}</h5>
-          <p class="card-text">{{venue.city}}</p>
+<div class="p-5">
+    <div class="container py-5 p-5">
+        <h2 class="text-white mb-4">Search Results</h2>
+
+        <div class="row mt-3">
+            {% for venue in venues %}
+            <div class="col-md-4 p-3">
+                <a class="text-decoration-none" href="{% url 'venue_detail' venue.id %}"> 
+                    <div class="card venue-card position-relative shadow-lg border-0">
+                        <img src="{{ venue.image.url }}" class="card-img-top venue-img" alt="Venue Image">
+                        <span class="position-absolute top-0 end-0 m-2 badge {% if venue.status %}bg-success{% else %}bg-danger{% endif %}">
+                            {% if venue.status %}Bookable{% else %}Not Bookable{% endif %}
+                        </span>
+                        <div class="card-body bg-dark text-white">
+                            <h5 class="card-title">{{ venue.name }}</h5>
+                            <p class="card-text">📍 {{ venue.city }}</p>
+                            {% comment %} <p class="card-text text-warning">&#9733; {{ venue.average_rating|default:"-" }} ({{ venue.review_count|default:0 }})</p> {% endcomment %}
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <p class="text-center text-white">No venues found.</p>
+            {% endfor %}
         </div>
-      </div>
     </div>
-    {% empty %}
-    <p>No matching venues found.</p>
-    {% endfor %}
-  </div>
-  {% else %}
-  <p>No results found.</p>
-  {% endif %}
 </div>
 
 {% endblock %}

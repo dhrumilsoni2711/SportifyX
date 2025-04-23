@@ -133,7 +133,7 @@
                
                 <li><a href="{% url "index" %}" class="nav-link">Home</a></li>
                 <li><a href="{% url "venue" %}" class="nav-link">Book</a></li>
-                <li><a href="{% url "players" %}" class="nav-link">Players</a></li>
+                <li><a href="{% url "nearbyplayers" %}" class="nav-link">Players</a></li>
                <li><a href="{% url "blog" %}"class="nav-link">Blog</a></li>
                 <li><a href="{% url "contact" %}" class="nav-link">Contact</a></li> 
                 {% comment %} <li><a href="{% url "contact" %}" class="nav-link">Login</a></li>  {% endcomment %}
@@ -144,7 +144,7 @@
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                     <li><a class="dropdown-item" href="{% url "profile" %}">Profile</a></li>
-                    {% comment %} <li><a class="dropdown-item" href="#">Another action</a></li> {% endcomment %}
+                    <li><a class="dropdown-item" href="{% url "notifications" %}">Notification</a></li>
                     <li> <a class="dropdown-item" href="{% url "logoutview" %}">Logout</a></li>
                   </ul>
                 </li>

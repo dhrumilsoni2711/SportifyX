@@ -1,0 +1,14 @@
+uv pip install geopy
+uv pip install djangorestframework
+uv pip install channels 
+uv pip install daphne 
+uv pip install pillow 
+uv pip install django 
+uv pip install razorpay
+uv pip install pdfkit  
+uv pip install reportlab 
+uv pip install pytz
+uv pip install weasyprint
+
+
+

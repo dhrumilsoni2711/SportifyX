@@ -1,0 +1,115 @@
+{% extends "master.html" %}
+{% block content %}
+
+<div class="p-5">
+    <div class="container py-5">
+        <h2 class="text-center text-white">Host a Game</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Select Game Category -->
+            <div class="form-group">
+                <label class="text-white">Select Game Category</label>
+                <select id="gameSelect" name="category" class="form-control" required>
+                    <option value="" selected disabled>Select a Game</option>
+                    {% for game in game_categories %}
+                        <option value="{{ game.id }}">{{ game.game_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Description (Manually Entered by Player) -->
+            <div class="form-group">
+                <label class="text-white">Description</label>
+                <textarea id="description" name="description" class="form-control" rows="3" required></textarea>
+            </div>
+
+            <!-- Select City -->
+            <div class="form-group">
+                <label class="text-white">Select City</label>
+                <select id="citySelect" class="form-control" required>
+                    <option value="" selected disabled>Select a City</option>
+                    {% for city in cities %}
+                        <option value="{{ city }}">{{ city }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Select Venue (Populated Dynamically) -->
+            <div class="form-group">
+                <label class="text-white">Select Venue</label>
+                <select id="venueSelect" name="venue" class="form-control" required>
+                    <option value="" selected disabled>Select a Venue</option>
+                </select>
+            </div>
+
+            <!-- Required Number of Players -->
+           <!-- Required Number of Players -->
+            <div class="form-group">
+                <label class="text-white">Number of Required Players</label>
+                <input type="number" name="required_players" class="form-control" min="1" max="15" placeholder="Enter number of players required" required>
+            </div>
+
+
+            <!-- Date & Time -->
+            <div class="form-group">
+                <label class="text-white">Date</label>
+                <input type="date" name="date" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label class="text-white">Time</label>
+                <input type="time" name="time" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-success mt-3">Create Game</button>
+
+            {% if message %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<!-- JavaScript to Load Venues by Game and City -->
+<script>
+    document.getElementById("gameSelect").addEventListener("change", function () {
+        loadVenues();  // Call function to filter venues
+    });
+
+    document.getElementById("citySelect").addEventListener("change", function () {
+        loadVenues();  // Call function to filter venues
+    });
+
+    function loadVenues() {
+        const gameId = document.getElementById("gameSelect").value;
+        const city = document.getElementById("citySelect").value;
+        const venueSelect = document.getElementById("venueSelect");
+
+        // Clear previous options
+        venueSelect.innerHTML = '<option value="" selected disabled>Select a Venue</option>';
+
+        if (gameId && city) {
+            fetch(`/playerapp/get_venues_by_game_and_city/?game_id=${gameId}&city=${city}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error("Error:", data.error);
+                        return;
+                    }
+                    console.log("Filtered Venues:", data); // Debugging
+
+                    data.forEach(venue => {
+                        const option = document.createElement("option");
+                        option.value = venue.id;
+                        option.textContent = `${venue.name} (${venue.city})`;
+                        venueSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching venues:', error));
+        }
+    }
+</script>
+
+{% endblock %}

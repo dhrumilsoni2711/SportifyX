@@ -1,64 +1,183 @@
 {% extends "adminapp/admin-master.html" %}
 {% load static %}
+
+<head>
+  <style>
+    /* Modern Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #d9534f; /* Default Inactive (Red) */
+      transition: 0.4s;
+      border-radius: 20px;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #5cb85c; /* Active - Green */
+      box-shadow: 0 0 10px rgba(92, 184, 92, 0.7); /* Green Glow */
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    /* Status Container */
+    .status-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Status Text */
+    .status-text {
+      font-weight: bold;
+      font-size: 14px;
+      padding: 5px 10px;
+      border-radius: 5px;
+      color: white;
+      display: inline-block;
+    }
+
+    .status-active {
+      background-color: #28a745;
+    }
+
+    .status-inactive {
+      background-color: #dc3545;
+    }
+
+  </style>
+</head>
+
 {% block content %}
 
+<!-- Content wrapper -->
+<div class="content-wrapper">
+  <div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Tables /</span> Venue Tables</h4>
 
-
-          <!-- Content wrapper -->
-          <div class="content-wrapper">
-            <!-- Content -->
-
-            <div class="container-xxl flex-grow-1 container-p-y">
-              <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Tables /</span> Venue Tables</h4>
-
-              <!-- Basic Bootstrap Table -->
-              <div class="card">
-                <h5 class="card-header">Table Basic</h5>
-                <div class="text-nowrap">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th scope ="col1">ID</th>
-                        <th scope ="col1">Name  </th>
-                        <th scope ="col1">Address </th>
-                        <th scope ="col1">Contact </th>
-                        <th scope ="col1">City </th>
-                        <th scope ="col1">State </th>
-                        <th scope ="col1">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody class="table-border-bottom-0">
-                      {% for context in data %}
-                      <tr>
-                       <th scope="row">{{ context.id }}</td> 
-                        <td>{{ context.name }}</td>
-                        <td>{{ context.address }}</td>
-                        <td>{{ context.contact }}</td>
-                        <td>{{ context.city }}</td>
-                        <td>{{ context.state }}</td>
-                        <td>{{ context.status }}</td>
-                          <td>
-                          <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                              <i class="bx bx-dots-vertical-rounded"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                              <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-trash me-1"></i> Delete</a>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
+    <div class="card">
+      <h5 class="card-header">Venue List</h5>
+      <div class="table-responsive text-nowrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Address</th>
+              <th>City</th>
+              <th>State</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for context in data %}
+            <tr>
+              <th scope="row">{{ context.id }}</th> 
+              <td>{{ context.name }}</td>
+              <td>{{ context.address }}</td>
+              <td>{{ context.city }}</td>
+              <td>{{ context.state }}</td>
+              <td>
+                <div class="status-container">
+                  <!-- Toggle Switch -->
+                  <label class="switch">
+                    <input type="checkbox" class="status-toggle" data-venue-id="{{ context.id }}" {% if context.status %}checked{% endif %}>
+                    <span class="slider round"></span>
+                  </label>
+                  <!-- Status Text -->
+                  <span class="status-text {% if context.status %}status-active{% else %}status-inactive{% endif %}" id="status-text-{{ context.id }}">
+                    {% if context.status %}🟢 Active{% else %}🔴 Deactive{% endif %}
+                  </span>
                 </div>
-              </div>
-              <!--/ Basic Bootstrap Table -->
+              </td>
+              <td>
+                <div class="dropdown">
+                  <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                    <i class="bx bx-dots-vertical-rounded"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item text-danger" href="{% url 'delete_venue' context.id %}">
+                      <i class="bx bx-trash me-1"></i> Delete
+                    </a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
-              <hr class="my-5" />
+<!-- JavaScript for Status Toggle -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".status-toggle").forEach(function (toggle) {
+      toggle.addEventListener("change", function () {
+        let venueId = this.getAttribute("data-venue-id");
+        let isChecked = this.checked;
+        let statusText = document.getElementById("status-text-" + venueId);
 
-          
-         
+        fetch(`/adminapp/toggle-venue-status/${venueId}/`, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/x-www-form-urlencoded"
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            if (data.status) {
+              statusText.textContent = "🟢 Active";
+              statusText.classList.remove("status-inactive");
+              statusText.classList.add("status-active");
+            } else {
+              statusText.textContent = "🔴 Deactive";
+              statusText.classList.remove("status-active");
+              statusText.classList.add("status-inactive");
+            }
+          } else {
+            alert("Error updating status.");
+          }
+        });
+      });
+    });
+  });
+</script>
 
 {% endblock %}
-    

@@ -1,0 +1,181 @@
+{% extends "adminapp/admin-master.html" %}
+{% load static %}
+{% block content %}
+
+<div class="content-wrapper">
+  <div class="container-xxl flex-grow-1 container-p-y">
+    <h3 class="fw-bold py-3 mb-4"> Add Venue Details </h3>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- 🔹 Select Multiple Venues -->
+        <div class="mb-4">
+          <label class="form-label"><strong>Select Venue</strong></label>
+          <select class="form-select" id="venue-select" name="venue_id" required>
+              <option value="" disabled selected>-- Select a Venue --</option>
+              {% for venue in venues %}
+                  <option value="{{ venue.id }}" data-name="{{ venue.name }}" data-image="{{ venue.image.url }}">
+                      {{ venue.name }} - {{ venue.city }}, {{ venue.state }}
+                  </option>
+              {% endfor %}
+          </select>
+      </div>
+      
+
+        <!-- 🔹 Venue Image & Name (Auto-filled, Read-Only) -->
+        <div id="venue-info" class="mb-4" style="display: none;">
+          <label class="form-label"><strong>Selected Venues</strong></label>
+          <div id="venue-details" class="d-flex flex-wrap gap-3"></div>
+        </div>
+
+        <!-- 🔹 Select Amenities -->
+        <div class="mb-4">
+          <label class="form-label"><strong>Select Amenities</strong></label>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-check">
+                <input class="form-check-input amenity-checkbox" type="checkbox" value="Car Parking" id="amenity1">
+                <label class="form-check-label" for="amenity1">Car Parking</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input amenity-checkbox" type="checkbox" value="Parking" id="amenity7">
+                <label class="form-check-label" for="amenity7">Parking</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input amenity-checkbox" type="checkbox" value="Restroom" id="amenity2">
+                <label class="form-check-label" for="amenity2">Restroom</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input amenity-checkbox" type="checkbox" value="Refreshments" id="amenity8">
+                <label class="form-check-label" for="amenity8">Refreshments</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input amenity-checkbox" type="checkbox" value="Washroom" id="amenity3">
+                <label class="form-check-label" for="amenity3">Washroom</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input amenity-checkbox" type="checkbox" value="CCTV Surveillance" id="amenity9">
+                <label class="form-check-label" for="amenity9">CCTV Surveillance</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check">
+                <input class="form-check-input amenity-checkbox" type="checkbox" value="Drinking Water" id="amenity4">
+                <label class="form-check-label" for="amenity4">Drinking Water</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input amenity-checkbox" type="checkbox" value="Locker Room" id="amenity5">
+                <label class="form-check-label" for="amenity5">Locker Room</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input amenity-checkbox" type="checkbox" value="Cafeteria" id="amenity6">
+                <label class="form-check-label" for="amenity6">Cafeteria</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input amenity-checkbox" type="checkbox" value="Centrally Air Conditioned Hall" id="amenity10">
+                <label class="form-check-label" for="amenity10">Centrally Air Conditioned Hall</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input amenity-checkbox" type="checkbox" value="Seating Arrangement" id="amenity11">
+                <label class="form-check-label" for="amenity11">Seating Arrangement</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input amenity-checkbox" type="checkbox" value="WiFi" id="amenity12">
+                <label class="form-check-label" for="amenity12">WiFi</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+
+        <!-- 🔹 Selected Amenities (Dropdown) -->
+        <div class="mb-4">
+          <label class="form-label"><strong>Selected Amenities</strong></label>
+          <select class="form-select" id="selected-amenities" name="venue_amenities" multiple required>
+            <!-- Dynamically added amenities -->
+          </select>
+        </div>
+
+        <!-- 🔹 Opening & Closing Time -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <label class="form-label"><strong>Opening Time</strong></label>
+            <input type="time" class="form-control" name="opening_time" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label"><strong>Closing Time</strong></label>
+            <input type="time" class="form-control" name="closing_time" required>
+          </div>
+        </div>
+
+
+        <!-- 🔹 Venue Description -->
+        <div class="mb-4">
+          <label class="form-label" for="venue-description"><strong>Venue Description</strong></label>
+          <textarea class="form-control" id="venue-description" placeholder="Enter venue description" name="venue_description" rows="4" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 🔹 JavaScript for Venue & Amenities Selection -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const venueSelect = document.getElementById('venue-select');
+    const venueDetailsDiv = document.getElementById('venue-details');
+    const venueInfoDiv = document.getElementById('venue-info');
+    const amenitiesDropdown = document.getElementById('selected-amenities');
+
+    venueSelect.addEventListener('change', function () {
+      venueDetailsDiv.innerHTML = ''; 
+      if (this.selectedOptions.length > 0) {
+        venueInfoDiv.style.display = "block";
+        for (let option of this.selectedOptions) {
+          let venueName = option.getAttribute('data-name');
+          let venueImage = option.getAttribute('data-image');
+
+          let venueDiv = document.createElement('div');
+          venueDiv.classList.add("text-center");
+          venueDiv.innerHTML = `
+            <div class="d-flex align-items-center gap-3">
+              <img src="${venueImage}" alt="Venue Image" style="width: 80px; height: 80px; border-radius: 10px;">
+              <p class="m-0"><strong>${venueName}</strong></p>
+            </div>
+          `;
+          venueDetailsDiv.appendChild(venueDiv);
+        }
+      } else {
+        venueInfoDiv.style.display = "none";
+      }
+    });
+
+    // 🔹 Manage Amenities Selection
+    document.querySelectorAll('.amenity-checkbox').forEach(function(checkbox) {
+      checkbox.addEventListener('change', function() {
+        if (this.checked) {
+          let option = document.createElement('option');
+          option.value = this.value;
+          option.text = this.value;
+          option.selected = true;
+          amenitiesDropdown.appendChild(option);
+        } else {
+          for (let i = 0; i < amenitiesDropdown.options.length; i++) {
+            if (amenitiesDropdown.options[i].value === this.value) {
+              amenitiesDropdown.removeChild(amenitiesDropdown.options[i]);
+              break;
+            }
+          }
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}

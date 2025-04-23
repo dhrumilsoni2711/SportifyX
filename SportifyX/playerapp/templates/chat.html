@@ -1,0 +1,87 @@
+{% extends "master.html" %}
+{% block content %}
+<div class="p-5">
+    <div class="container py-5">
+        
+        <!-- 🔙 Back Button -->
+        <div class="mb-3">
+            <a href="javascript:history.back()" class="btn btn-outline-light">⬅ Back</a>
+        </div>
+
+        <h2 class="text-center text-white mb-4">💬 Chat with {{ receiver.username }}</h2>
+
+        <div class="chat-box bg-dark p-3 rounded">
+            <div id="chat-messages" class="chat-messages">
+                {% for msg in messages %}
+                    <div class="chat-message {% if msg.sender == request.user %}sent{% else %}received{% endif %}">
+                        <strong>{{ msg.sender.username }}</strong>: {{ msg.message }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <form id="chat-form" class="mt-3">
+            <input type="text" id="message-input" class="form-control bg-secondary text-white" placeholder="Type a message...">
+            <button type="submit" class="btn btn-primary mt-2">Send</button>
+        </form>
+    </div>
+</div>
+
+<!-- ✅ WebSocket Script -->
+<script>
+    const receiverId = "{{ receiver.id }}";  // Get receiver ID
+    const chatSocket = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${receiverId}/`);  // ✅ Use dynamic WebSocket URL
+
+    chatSocket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        const messageContainer = document.getElementById("chat-messages");
+
+        // ✅ Append message to chat
+        const newMessage = document.createElement("div");
+        newMessage.classList.add("chat-message", data.sender === "{{ request.user.username }}" ? "sent" : "received");
+        newMessage.innerHTML = `<strong>${data.sender}</strong>: ${data.message}`;
+        messageContainer.appendChild(newMessage);
+    };
+
+    document.getElementById("chat-form").onsubmit = function(event) {
+        event.preventDefault();
+        const messageInput = document.getElementById("message-input");
+        const message = messageInput.value.trim();
+
+        if (message) {
+            chatSocket.send(JSON.stringify({
+                "message": message,
+                "sender": "{{ request.user.id }}",
+                "receiver": receiverId
+            }));
+            messageInput.value = "";
+        }
+    };
+</script>
+
+<!-- ✅ Styling -->
+<style>
+    .chat-box {
+        height: 400px;
+        overflow-y: auto;
+        border-radius: 10px;
+        border: 1px solid #333;
+    }
+    .chat-message {
+        padding: 10px;
+        border-radius: 8px;
+        margin: 5px 0;
+    }
+    .sent {
+        background-color: #007bff;
+        color: white;
+        text-align: right;
+    }
+    .received {
+        background-color: #333;
+        color: white;
+        text-align: left;
+    }
+</style>
+
+{% endblock %}

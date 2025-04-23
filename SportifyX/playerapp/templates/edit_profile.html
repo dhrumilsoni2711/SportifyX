@@ -1,0 +1,104 @@
+{% extends "master.html" %}
+{% load static %}
+{% block content %}
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="container bootstrap snippets bootdey p-5">
+    <div class="p-5 d-flex gap-5">
+        <div class="profile-nav col-md-3">
+            <div class="panel">
+                <div class="user-heading round">
+                    <img src="https://img.freepik.com/premium-photo/flat-icon-isolated-background_1375069-5555.jpg?ga=GA1.1.25006794.1721460010&semt=ais_hybrid_sidr" alt="">
+                    <h1 id="userFullName">{{ request.user.first_name }} {{ request.user.last_name }}</h1>
+                    <p id="userEmail">{{ request.user.email }}</p>
+                </div>
+                <ul class="list-group">
+                    <li class="list-group-items pt-2"><a href="#"> <i class="fa fa-user"></i> Profile</a></li>
+                    <li class="list-group-items pt-2">
+                        <a href="#" id="editProfileBtn"> <i class="fa fa-edit"></i> Edit Profile</a>
+                    </li>
+                    <li class="list-group-items pt-2"><a href="#"> <i class="fa fa-clock-o"></i> Recent Activity </a></li>
+                    <li class="list-group-items pt-2"><a href="#"> <i class="fa fa-calendar"></i> All Bookings </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="profile-info col-md-9">
+            <!-- Edit Profile Form (Initially Hidden) -->
+            <div class="panel" id="editProfileSection" style="display: none;">
+                <div class="panel-body bio-graph-info">
+                    <h1>Edit Profile</h1>
+                    <form id="editProfileForm">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>First Name</label>
+                                <input type="text" name="first_name" class="form-control" value="{{ request.user.first_name }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Last Name</label>
+                                <input type="text" name="last_name" class="form-control" value="{{ request.user.last_name }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Email</label>
+                                <input type="email" class="form-control" value="{{ request.user.email }}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Contact</label>
+                                <input type="text" class="form-control" value="{{ request.user.profile.contact }}" readonly>
+                            </div>
+                            <div class="col-md-12">
+                                <label>Address</label>
+                                <input type="text" name="address" class="form-control" value="{{ request.user.profile.address }}">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                        <button type="button" id="cancelEditBtn" class="btn btn-secondary mt-3">Cancel</button>
+                        <p id="successMessage" class="text-success mt-2" style="display: none;">Profile updated successfully!</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include jQuery for AJAX -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Show the edit form when "Edit Profile" button is clicked
+        $("#editProfileBtn").click(function () {
+            $("#editProfileSection").show();
+        });
+
+        // Hide the edit form when "Cancel" button is clicked
+        $("#cancelEditBtn").click(function () {
+            $("#editProfileSection").hide();
+        });
+
+        // Handle form submission using AJAX
+        $("#editProfileForm").submit(function (event) {
+            event.preventDefault();  // Prevent page reload
+
+            $.ajax({
+                type: "POST",
+                url: "{% url 'update_profile' %}",  // Django URL for updating profile
+                data: $(this).serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        $("#successMessage").show().delay(3000).fadeOut();  // Show success message
+                        
+                        // Update profile details dynamically
+                        $("#userFullName").text(response.first_name + " " + response.last_name);
+                        $("#userEmail").text(response.email);
+                        
+                        // Hide the form
+                        $("#editProfileSection").hide();
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

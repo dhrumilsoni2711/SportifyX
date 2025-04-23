@@ -2,67 +2,77 @@
 {% load static %}
 {% block content %}
 
+<!-- Content wrapper -->
+<div class="content-wrapper">
+  <!-- Content -->
+  <div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold py-3 mb-4">
+      <span class="text-muted fw-light">Tables /</span> User Tables
+    </h4>
 
+    <!-- Basic Bootstrap Table -->
+    <div class="card">
+      <h5 class="card-header">Table Basic</h5>
+      <div class="text-nowrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Username</th>
+              <th scope="col">Contact</th>
+              <th scope="col">Email</th>
+              <th scope="col">Address</th>
+              <th scope="col">Location</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+            {% for user in data %}
+            <tr>
+              <th scope="row">{{ user.id }}</th>
+              <td>{{ user.username }}</td>
+              <td>{{ user.contact }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.address }}</td>
 
-          <!-- Content wrapper -->
-          <div class="content-wrapper">
-            <!-- Content -->
+              <!-- Google Maps Button -->
+              <td>
+                {% if user.latitude and user.longitude %}
+                <a href="https://www.google.com/maps?q={{ user.latitude }},{{ user.longitude }}" 
+                   target="_blank" 
+                   class="btn btn-primary btn-sm">
+                   View on Google Maps
+                </a>
+                {% else %}
+                <span class="text-muted">Not Available</span>
+                {% endif %}
+              </td>
 
-            <div class="container-xxl flex-grow-1 container-p-y">
-              <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Tables /</span> User Tables</h4>
-
-              <!-- Basic Bootstrap Table -->
-              <div class="card">
-                <h5 class="card-header">Table Basic</h5>
-                <div class="text-nowrap">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th scope ="col1">ID</th>
-                        {% comment %} <th scope ="col1">First Name </th>
-                        <th scope ="col1">Last Name </th> {% endcomment %}
-                        <th scope ="col1">Username</th>
-                        <th scope ="col1">Contact </th>
-                        <th scope ="col1">Email</th>
-                        <th scope ="col1">Address</th>
-                        
-                      </tr>
-                    </thead>
-                    <tbody class="table-border-bottom-0">
-                      {% for context in data %}
-                      <tr>
-                        <th scope="row">{{ context.id }}</td>
-                        {% comment %} <td>{{ context.firstname }}</td>
-                        <td>{{ context.lastname }}</td> {% endcomment %}
-                        <td>{{ context.username }}</td>
-                        <td>{{ context.contact }}</td>
-                        <td>{{ context.email }}</td>
-                        <td>{{ context.address }}</td>
-                  
-                          <td>
-                          <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                              <i class="bx bx-dots-vertical-rounded"></i>
-                            </button>
-                            <div class="dropdown-menu">
-                              <a class="dropdown-item" href="{% url "delete_player" context.id %}"><i class="bx bx-trash me-1"></i> Delete</a>
-                              <a class="dropdown-item" href="#"><i class='bx bx-block me-2'></i>Block</a>
-
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
+              <!-- Actions Dropdown -->
+              <td>
+                <div class="dropdown">
+                  <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                    <i class="bx bx-dots-vertical-rounded"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="{% url 'delete_player' user.id %}">
+                      <i class="bx bx-trash me-1"></i> Delete
+                    </a>
+                    <a class="dropdown-item" href="#">
+                      <i class="bx bx-block me-2"></i>Block
+                    </a>
+                  </div>
                 </div>
-              </div>
-              <!--/ Basic Bootstrap Table -->
+              </td>
 
-              <hr class="my-5" />
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!--/ Basic Bootstrap Table -->
 
-          
-         
+    <hr class="my-5" />
 
 {% endblock %}
-    

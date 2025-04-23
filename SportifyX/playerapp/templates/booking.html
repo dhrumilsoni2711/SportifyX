@@ -1,0 +1,324 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Include Flatpickr CSS & JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<!-- CSS Styles -->
+<style>
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+    .booking-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    .booking-card {
+        background: #1e1e1e;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        max-width: 900px;
+        width: 100%;
+    }
+    .form-section {
+        flex: 1;
+        padding-right: 20px;
+    }
+    .preview-section {
+        flex: 1;
+        text-align: center;
+        background: #252525;
+        padding: 20px;
+        border-radius: 10px;
+    }
+    label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        margin: 10px 0 5px;
+    }
+    select, input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #333;
+        background: #252525;
+        color: #e0e0e0;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+    .booking-form button {
+        width: 100%;
+        background: #ff9800;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 15px;
+    }
+    .booking-form button:hover {
+        background: #e68900;
+    }
+    .price-details {
+        margin-top: 10px;
+        padding: 10px;
+        background: #252525;
+        border-radius: 5px;
+    }
+    .price-label {
+        font-size: 16px;
+        font-weight: bold;
+    }
+</style>
+
+<!-- Booking Form Container -->
+<div class ="p-5">
+    <div class="booking-container p-5">
+        <div class="booking-card">
+            <!-- Form Section -->
+            <div class="form-section">
+                <h2>Book a Venue</h2>
+                <form id="bookingForm" action="{% url 'confirm_booking' %}" class="booking-form">
+                    {% csrf_token %}
+                    
+                    <label for="venue">Selected Venue:</label>
+                    <select id="venue" name="venue" disabled>
+                        {% for venue in venues %}
+                            <option value="{{ venue.id }}" {% if venue.id|stringformat:"s" == request.GET.venue_id %}selected{% endif %}>
+                                {{ venue.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <input type="hidden" name="venue" value="{{ request.GET.venue_id }}">
+
+                    <label for="game">Select Game:</label>
+                    <select id="game" name="game">
+                        <option value="">-- Select Game --</option>
+                    </select>
+
+                    <label for="date">Select Date:</label>
+                    <input type="text" id="date" name="date" placeholder="Select a date" required>
+
+                    <label for="start_time">Start Time:</label>
+                    <input type="text" id="start_time" name="start_time" placeholder="Select a time" required>
+
+                    <label for="duration">Duration (in hours):</label>
+                    <input type="number" id="duration" name="duration" value="1" min="1" max="8">
+                    
+                    <button type="submit">Confirm Booking</button>
+                </form>
+            </div>
+
+            <!-- Price Preview Section -->
+            <div class="preview-section">
+                <h3>Booking Summary</h3>
+                <div class="price-details">
+                    <p class="price-label">Price per Hour: <span id="pricePerHour">-</span></p>
+                    <p class="price-label">Total Price: <span id="totalPrice">-</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- JavaScript for Flatpickr and Redirection -->
+ <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+ <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // ✅ Store CSRF token once
+        var csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+        // ✅ Initialize Flatpickr for date and time selection
+        flatpickr("#date", {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            maxDate: new Date().fp_incr(20),
+        });
+
+        flatpickr("#start_time", {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "H:i",
+        });
+
+        var gameDropdown = document.getElementById("game");
+        var durationInput = document.getElementById("duration");
+        var pricePerHourSpan = document.getElementById("pricePerHour");
+        var totalPriceSpan = document.getElementById("totalPrice");
+
+        var venueId = new URLSearchParams(window.location.search).get("venue_id");
+        if (venueId) {
+            loadGames(venueId);
+        }
+
+        function loadGames(venueId) {
+            gameDropdown.innerHTML = '<option value="">-- Loading Games --</option>';
+            gameDropdown.disabled = true;
+
+            fetch(`/playerapp/get_games/?venue_id=${venueId}`)
+                .then(response => response.json())
+                .then(data => {
+                    gameDropdown.innerHTML = '<option value="">-- Select Game --</option>';
+                    gameDropdown.disabled = false;
+
+                    if (!data.games || data.games.length === 0) {
+                        gameDropdown.innerHTML = '<option value="">No games available</option>';
+                        return;
+                    }
+
+                    data.games.forEach(game => {
+                        var option = document.createElement("option");
+                        option.value = game.id;
+                        option.textContent = game.name;
+                        option.dataset.price = game.price;
+                        gameDropdown.appendChild(option);
+                    });
+
+                    if (data.games.length > 0) {
+                        gameDropdown.selectedIndex = 1;
+                        updatePrice();
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching games:", error);
+                    gameDropdown.innerHTML = '<option value="">Error loading games</option>';
+                });
+        }
+
+        function updatePrice() {
+            var selectedGame = gameDropdown.options[gameDropdown.selectedIndex];
+            if (selectedGame && selectedGame.dataset.price) {
+                var pricePerHour = parseFloat(selectedGame.dataset.price);
+                pricePerHourSpan.textContent = `₹${pricePerHour}`;
+                var duration = parseInt(durationInput.value) || 1;
+                totalPriceSpan.textContent = `₹${pricePerHour * duration}`;
+            } else {
+                pricePerHourSpan.textContent = "-";
+                totalPriceSpan.textContent = "-";
+            }
+        }
+
+        gameDropdown.addEventListener("change", updatePrice);
+        durationInput.addEventListener("input", updatePrice);
+
+        document.getElementById("bookingForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            var total_price = document.getElementById("totalPrice").textContent.replace("₹", "").trim();
+            if (!total_price) {
+                alert("Total price is missing!");
+                return;
+            }
+
+            fetch("/playerapp/confirm_booking/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": csrfToken
+                },
+                body: new URLSearchParams({
+                    "venue": document.getElementById("venue").value,
+                    "game": document.getElementById("game").value,
+                    "date": document.getElementById("date").value,
+                    "start_time": document.getElementById("start_time").value,
+                    "duration": document.getElementById("duration").value,
+                    "total_price": total_price
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    var bookingId = data.booking_id;
+
+                    fetch("/playerapp/create_razorpay_order/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "X-CSRFToken": csrfToken
+                        },
+                        body: new URLSearchParams({ "booking_id": bookingId })
+                    })
+                    .then(
+                        response => response.json() 
+                    )
+                    .then(orderData => {
+                        var rzp = new Razorpay(orderData);
+                        console.log("---------------",orderData);
+                        {% comment %} rzp.open(); {% endcomment %}
+                        
+                        var rzp = new Razorpay({
+                            key: 'rzp_test_Un9u2srfuSMbIf',  // ✅ Ensure Razorpay Key is provided
+                            amount: orderData.amount, 
+                            currency: orderData.currency,
+                            order_id: orderData.order_id,
+                            name: "SportifyX",
+                            description: "Venue Booking Payment",
+                            handler: function (response) {
+                                console.log("Payment Success Event Triggered!");
+                                console.log("Payment Data:", response);
+                    
+                                fetch("/playerapp/update_payment_status/", {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/x-www-form-urlencoded",
+                                        "X-CSRFToken": csrfToken
+                                    },
+                                    body: new URLSearchParams({
+                                        "razorpay_payment_id": response.razorpay_payment_id,
+                                        "razorpay_order_id": response.razorpay_order_id,
+                                        "razorpay_signature": response.razorpay_signature
+                                    }),
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        console.log("Payment successfully updated in the backend.");
+                                        resetForm();
+                                        window.location.href = "/playerapp/payment_success/?booking_id=" + bookingId;
+                                    } else {
+                                        alert("Payment update failed: " + data.error);
+                                    }
+                                })
+                                .catch(error => console.error("Error updating payment status:", error));
+                            },
+                            prefill: {
+                                email: "user@example.com",
+                                contact: "9999999999"
+                            },
+                            theme: {
+                                color: "#3399cc"
+                            }
+                        });
+                    
+                            console.log("Opening Razorpay Payment Gateway...");  // ✅ Debugging
+                            rzp.open();  // ✅ Open Razorpay
+                        
+                        })
+                            .catch(error => console.error("Error updating payment status:", error));
+                }
+            });
+
+        function resetForm() {  
+            document.getElementById("bookingForm").reset();
+            pricePerHourSpan.textContent = "-";
+            totalPriceSpan.textContent = "-";
+        }
+
+    });
+});
+</script>
+
+
+
+{% endblock %}

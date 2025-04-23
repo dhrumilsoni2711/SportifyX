@@ -23,6 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-zflef506bwqhj)497&1hp+sm-k(3*%egs3u@go_9qe8k!bixn1'
 
+# GDAL library
+GDAL_LIBRARY_PATH = os.path.join("/opt/homebrew/Cellar/gdal/3.10.2/lib/libgdal.dylib")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -32,6 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",  # Django Channels ASGI Server
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,12 +44,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'playerapp', # Add the playerapp to the list of installed apps
     'adminapp', # Add the adminapp to the list of installed apps
-    "daphne",  # Django Channels ASGI Server
     "channels",
     "django.contrib.gis",  # For location-based features
     "rest_framework",
-    "playerapp",
-    "adminapp",
+
 
 ]
 
@@ -84,6 +86,7 @@ WSGI_APPLICATION = 'SportifyX.wsgi.application'
 
 # Set up WebSockets backend
 ASGI_APPLICATION = "SportifyX.asgi.application"
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer",  # Change to Redis for production
@@ -160,3 +163,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'sportifyx04@gmail.com'
 EMAIL_HOST_PASSWORD = 'eczo xugd njek fpjj'
 # EMAIL_USE_SSL = False
+
+# Razorpay API Keys
+RAZORPAY_KEY_ID = "rzp_test_Un9u2srfuSMbIf"
+RAZORPAY_KEY_SECRET = "4VtGBs5kTIvixaLW9D2JDPUD"

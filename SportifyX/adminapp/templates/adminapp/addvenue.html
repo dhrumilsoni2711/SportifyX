@@ -1,8 +1,7 @@
 <html>
   {% extends "adminapp/admin-master.html" %}
   {% load static %}
-  <head>
-  </head>
+  <head></head>
   {% block content %}
 
   <div class="content-wrapper">
@@ -13,7 +12,7 @@
     <div class="card-body">
       <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        
+
         <!-- Venue Name -->
         <div class="mb-3">
           <label class="form-label" for="venue-name">Venue Name</label>
@@ -26,6 +25,18 @@
           <input type="text" class="form-control" id="venue-address" name="address" placeholder="Enter venue address" required />
         </div>
 
+        <!-- Latitude & Longitude -->
+        <div class="row">
+          <div class="col-md-6">
+            <label class="form-label" for="latitude">Latitude</label>
+            <input type="number" step="any" class="form-control" id="latitude" name="latitude" placeholder="Enter latitude" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="longitude">Longitude</label>
+            <input type="number" step="any" class="form-control" id="longitude" name="longitude" placeholder="Enter longitude" required />
+          </div>
+        </div>
+
         <!-- Select Games -->
         <div class="mb-3">
           <label class="form-label">Select Games</label>
@@ -35,7 +46,10 @@
             </button>
             <ul class="dropdown-menu p-3" aria-labelledby="gameDropdown">
               {% for context in game_data %}
-                <li><input type="checkbox" class="form-check-input game-option" value="{{ context.game_name }}"> {{ context.game_name }} </li>
+                <li class="form-check">
+                  <input type="checkbox" class="form-check-input game-option" value="{{ context.id }}" id="game{{ forloop.counter }}">
+                  <label class="form-check-label" for="game{{ forloop.counter }}">{{ context.game_name }}</label>
+                </li>
               {% endfor %}
             </ul>
           </div>
@@ -78,6 +92,12 @@
           <input type="url" name="location" class="form-control" id="location" placeholder="Enter Google Maps URL" required />
         </div>
 
+        <!-- Google Maps Preview -->
+        <div class="mb-3">
+          <label class="form-label">Map Preview</label>
+          <iframe id="mapPreview" class="rounded" src="" width="100%" height="200" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+        </div>
+
         <button type="submit" class="btn btn-primary">Submit</button>
       </form>
     </div>
@@ -117,17 +137,26 @@
 
       checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function () {
-          const selectedGames = [];
-          checkboxes.forEach(option => {
-            if (option.checked) {
-              selectedGames.push(option.value);
-            }
-          });
+          const selectedGames = Array.from(checkboxes)
+            .filter(option => option.checked)
+            .map(option => option.value);
 
           selectedGamesTextBox.value = selectedGames.join(', ');
           selectedGamesInput.value = selectedGames.join(', ');  // Store comma-separated IDs
         });
       });
+
+      // Update Google Maps Preview when Latitude & Longitude are entered
+      document.getElementById("latitude").addEventListener("input", updateMapPreview);
+      document.getElementById("longitude").addEventListener("input", updateMapPreview);
+
+      function updateMapPreview() {
+        const lat = document.getElementById("latitude").value;
+        const lon = document.getElementById("longitude").value;
+        if (lat && lon && !isNaN(lat) && !isNaN(lon)) {
+          document.getElementById("mapPreview").src = `https://www.google.com/maps?q=${lat},${lon}&output=embed`;
+        }
+      }
     });
   </script>
 

@@ -1,0 +1,124 @@
+{% extends "master.html" %}
+{% block content %}
+
+<div class="p-5">
+    <div class="container py-5">
+        <h2 class="text-center text-white mb-4">📩 Game Join Requests</h2>
+
+        <!-- 🔵 Pending Requests Section -->
+        <div class="card glassmorphism shadow-lg mb-4">
+            <div class="card-header bg-primary text-center text-white">
+                <h4 class="mb-0">Pending Requests</h4>
+            </div>
+            <div class="card-body">
+                <ul id="pendingRequestsList" class="list-group list-group-flush">
+                    {% for notification in pending_notifications %}
+                        <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="fw-bold">{{ notification.player.username }}</span> wants to join  
+                                <span class="text-warning">{{ notification.game.game_category.game_name }}</span>  
+                                at <span class="text-info">{{ notification.game.venue.name }}</span>
+                            </div>
+                            <div>
+                                <form action="{% url 'accept_request' notification.id %}" method="POST" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success btn-sm px-3">✅ Accept</button>
+                                </form>
+                                <form action="{% url 'decline_request' notification.id %}" method="POST" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm px-3">❌ Decline</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <p class="text-center text-muted">🚫 No pending requests.</p>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- ✅ Chat Button Section for Both Players -->
+        <div class="card glassmorphism shadow-lg">
+            <div class="card-header bg-secondary text-center text-white">
+                <h4 class="mb-0">Chat with Accepted Players</h4>
+            </div>
+            <div class="card-body">
+                <ul id="chatPlayersList" class="list-group list-group-flush">
+                    {% for notification in past_notifications %}
+                        {% if notification.status == "accepted" %}
+                            <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="fw-bold">{{ notification.player.username }}</span>  
+                                    <span class="text-warning">{{ notification.game.game_category.game_name }}</span>  
+                                    at <span class="text-info">{{ notification.game.venue.name }}</span>
+                                </div>
+                                <a href="{% url 'chat' notification.player.id %}" class="btn btn-secondary btn-sm px-3">💬 Chat</a>
+                            </li>
+                        {% endif %}
+                    {% empty %}
+                        <p class="text-center text-muted">🚫 No accepted players yet.</p>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- 🌟 Custom Styling for Modern Design -->
+<style>
+    body {
+        background: linear-gradient(135deg, #1a1a1a, #292929);
+        color: white;
+        font-family: "Poppins", sans-serif;
+    }
+    .card {
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.1);
+        border: none;
+    }
+    .glassmorphism {
+        background: rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 20px;
+        transition: transform 0.2s ease-in-out;
+    }
+    .glassmorphism:hover {
+        transform: scale(1.02);
+    }
+    .list-group-item {
+        border: none;
+        background: transparent;
+        padding: 15px 20px;
+        border-radius: 8px;
+        transition: 0.3s;
+    }
+    .list-group-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+    .btn {
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+</style>
+
+<!-- ✅ WebSockets for Real-Time Updates -->
+<script>
+    const socket = new WebSocket("ws://127.0.0.1:8000/ws/notifications/");
+
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+
+        if (data.pending_html) {
+            document.getElementById("pendingRequestsList").innerHTML = data.pending_html;
+        }
+        if (data.past_html) {
+            document.getElementById("chatPlayersList").innerHTML = data.past_html;
+        }
+    };
+</script>
+
+{% endblock %}
